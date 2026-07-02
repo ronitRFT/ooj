@@ -26,14 +26,23 @@ async function convertHtmlToPdf(htmlFilePath, pdfFilePath) {
   const page = await browser.newPage();
 
   try {
+    await page.setViewport({
+      width: 794,
+      height: 1123,
+      deviceScaleFactor: 1,
+    });
+
     const fileUrl = `file://${path.resolve(htmlFilePath)}`;
     await page.goto(fileUrl, { waitUntil: 'networkidle0', timeout: 30000 });
+
+    await page.emulateMediaType('print');
 
     await page.pdf({
       path: pdfFilePath,
       format: 'A4',
       printBackground: true,
-      margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
+      preferCSSPageSize: true,
+      margin: { top: 0, right: 0, bottom: 0, left: 0 },
     });
 
     return pdfFilePath;

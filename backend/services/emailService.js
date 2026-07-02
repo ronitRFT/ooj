@@ -8,13 +8,11 @@ const { buildGuestInvitationHtml } = require('../utils/emailTemplates');
 async function sendInvitationEmail(guest, event, invitation, qrCodePath) {
   const validation = validateEmail(guest.email);
   if (!validation.valid) {
-    console.log(`Email failed for guest ${guest.uuid}: ${validation.error}`);
     return { sent: false, skipped: true, reason: validation.error };
   }
 
   if (!isEmailConfigured()) {
     const reason = 'SMTP is not configured. Set SMTP_USER and SMTP_PASS in .env';
-    console.log(`Email failed for guest ${guest.uuid}: ${reason}`);
     return { sent: false, skipped: true, reason };
   }
 

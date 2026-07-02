@@ -1,0 +1,106 @@
+.event-list-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-soft);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
+}
+
+.event-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.event-list-table th {
+  background: var(--bg-soft);
+  color: var(--primary);
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.event-list-table td {
+  padding: 14px 16px;
+  border-top: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  vertical-align: middle;
+}
+
+.event-list-table tbody tr:hover {
+  background: var(--bg-warm);
+}
+
+.event-list-table strong {
+  display: block;
+  color: var(--text);
+}
+
+.event-sub {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.nowrap {
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-draft { background: var(--primary-soft); color: var(--primary); }
+.status-active { background: rgba(5, 150, 105, 0.1); color: #059669; }
+.status-completed { background: rgba(107, 114, 128, 0.1); color: var(--text-muted); }
+.status-archived { background: var(--bg-soft); color: var(--text-light); }
+
+.event-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.action-btn {
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  background: var(--white);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.action-btn:hover {
+  background: var(--bg-soft);
+  color: var(--text);
+  border-color: var(--secondary);
+}
+
+.action-btn.active-btn {
+  border-color: rgba(5, 150, 105, 0.3);
+  color: #059669;
+}
+
+.action-btn.danger {
+  border-color: rgba(217, 119, 6, 0.25);
+  color: var(--primary-hover);
+}
+
+.event-list-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 48px;
+}

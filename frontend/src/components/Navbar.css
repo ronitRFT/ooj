@@ -1,68 +1,111 @@
 .navbar {
-  background: rgba(26, 26, 46, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(233, 69, 96, 0.2);
+  background: rgba(250, 247, 242, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-soft);
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
 .navbar-inner {
-  max-width: 1200px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 64px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .navbar-brand {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   text-decoration: none;
-  letter-spacing: 0.5px;
+  color: var(--text);
 }
 
-.brand-accent {
-  color: #e94560;
+.navbar-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--secondary-soft) 100%);
+  border-radius: 50%;
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-text strong {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.brand-text small {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
 
 .navbar-links {
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .navbar-links a {
-  color: #aaa;
+  color: var(--text-muted);
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
   font-size: 0.9rem;
-  transition: all 0.2s;
+  font-weight: 500;
+  transition: all var(--transition);
 }
 
 .navbar-links a:hover,
 .navbar-links a.active {
-  color: #fff;
-  background: rgba(233, 69, 96, 0.15);
+  color: var(--primary);
+  background: var(--primary-soft);
 }
 
-.navbar-links a.active {
-  color: #e94560;
+.navbar-links .nav-admin {
+  border: 1px solid var(--border);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
+  :root {
+    --navbar-height: 128px;
+  }
+
   .navbar-inner {
     flex-direction: column;
     height: auto;
-    padding: 12px 16px;
-    gap: 12px;
+    padding: 16px;
+    gap: 14px;
   }
 
   .navbar-links {
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  .navbar-links a {
+    padding: 8px 14px;
+    font-size: 0.85rem;
   }
 }

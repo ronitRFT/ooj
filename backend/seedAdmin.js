@@ -2,11 +2,21 @@ require('dotenv').config();
 const bcrypt = require('bcrypt');
 const mysql = require('mysql2/promise');
 
-const USERNAME = 'superadmin';
-const PASSWORD = 'admin123';
+const USERNAME = process.env.ADMIN_USERNAME;
+const PASSWORD = process.env.ADMIN_PASSWORD;
 const SALT_ROUNDS = 10;
 
 async function seedAdmin() {
+  if (!USERNAME || !String(USERNAME).trim()) {
+    console.error('ADMIN_USERNAME environment variable is required');
+    process.exit(1);
+  }
+
+  if (!PASSWORD || !String(PASSWORD).trim()) {
+    console.error('ADMIN_PASSWORD environment variable is required');
+    process.exit(1);
+  }
+
   const connection = await mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',

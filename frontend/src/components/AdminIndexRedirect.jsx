@@ -1,6 +1,8 @@
 import { Navigate } from 'react-router-dom';
+import { isStoredAdminTokenValid } from '../utils/adminAuth';
 
 export default function AdminIndexRedirect() {
-  const token = localStorage.getItem('adminToken');
-  return <Navigate to={token ? '/admin/dashboard' : '/admin/login'} replace />;
+  return (
+    <Navigate to={isStoredAdminTokenValid() ? '/admin/dashboard' : '/admin/login'} replace />
+  );
 }

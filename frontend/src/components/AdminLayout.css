@@ -1,15 +1,18 @@
 .admin-layout {
-  min-height: calc(100dvh - 60px);
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(200, 169, 81, 0.06) 0%, transparent 60%),
+    var(--bg-warm);
 }
 
 .admin-layout-content {
-  max-width: 1200px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 20px 24px 40px;
+  padding: 40px 24px 64px;
 }
 
 @media (max-width: 600px) {
   .admin-layout-content {
-    padding: 16px 16px 32px;
+    padding: 24px 16px 48px;
   }
 }

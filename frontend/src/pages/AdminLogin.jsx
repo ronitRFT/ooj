@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { adminAPI, setAdminToken, clearAdminToken } from '../services/api';
+import { adminAPI, setAdminToken } from '../services/api';
+import { isStoredAdminTokenValid } from '../utils/adminAuth';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
@@ -9,8 +10,7 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem('adminToken');
-  if (token) {
+  if (isStoredAdminTokenValid()) {
     return <Navigate to="/admin/dashboard" replace />;
   }
 

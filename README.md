@@ -86,11 +86,14 @@ Frontend runs at `http://localhost:5173`
 | GET    | `/api/health`                | Health check             |
 | GET    | `/api/events/active`         | Active event details     |
 | POST   | `/api/guests/register`       | Register a guest         |
-| POST   | `/api/guests/check-in`       | Mark attendance          |
-| GET    | `/api/guests/uuid/:uuid`     | Get guest by UUID        |
+| GET    | `/api/guests/uuid/:uuid/success` | Success page data    |
+| GET    | `/api/guests/uuid/:uuid`     | Limited guest status     |
 | POST   | `/api/admin/login`           | Admin login              |
-| GET    | `/api/admin/stats`           | Dashboard statistics     |
+| POST   | `/api/admin/check-in`        | Mark attendance (admin)  |
 | GET    | `/api/admin/guests`          | All registered guests    |
+| GET    | `/api/admin/guests/:id/assets` | Recover guest QR/PDF   |
+| PATCH  | `/api/admin/guests/:id/attendance` | Manual attendance toggle |
+| GET    | `/api/admin/registration-qr` | Public registration QR   |
 
 ## Default Admin Credentials
 

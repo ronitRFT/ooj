@@ -26,19 +26,13 @@ function buildAuthHeaders() {
   return { Authorization: `Bearer ${token}` };
 }
 
-let unauthorizedRedirect = '/admin/login';
-
-export function setUnauthorizedRedirect(path) {
-  unauthorizedRedirect = path;
-}
-
 function handleUnauthorized() {
   clearAdminToken();
   const isAdminRoute = window.location.pathname.startsWith('/admin')
     && !window.location.pathname.startsWith('/admin/login');
 
   if (isAdminRoute) {
-    window.location.href = unauthorizedRedirect;
+    window.location.href = '/admin/login';
   }
 }
 
@@ -60,7 +54,7 @@ api.interceptors.response.use(
   }
 );
 
-function adminPost(url, data) {
+function adminRequest(method, url, data) {
   const headers = buildAuthHeaders();
   if (!headers) {
     handleUnauthorized();
@@ -69,46 +63,55 @@ function adminPost(url, data) {
       code: 'NO_TOKEN',
     });
   }
-  return api.post(url, data, { headers });
+  return api({ method, url, data, headers });
+}
+
+function adminPost(url, data) {
+  return adminRequest('post', url, data);
 }
 
 function adminGet(url) {
-  const headers = buildAuthHeaders();
-  if (!headers) {
-    handleUnauthorized();
-    return Promise.reject({
-      response: { status: 401, data: { message: 'Unauthorized' } },
-      code: 'NO_TOKEN',
-    });
-  }
-  return api.get(url, { headers });
+  return adminRequest('get', url);
+}
+
+function adminPut(url, data) {
+  return adminRequest('put', url, data);
+}
+
+function adminPatch(url, data) {
+  return adminRequest('patch', url, data);
+}
+
+function adminDelete(url) {
+  return adminRequest('delete', url);
 }
 
 export const eventAPI = {
   getActive: () => api.get('/events/active'),
-  getAll: () => api.get('/events'),
-  getById: (id) => api.get(`/events/${id}`),
-  getRegistrationQr: () => api.get('/events/registration-qr'),
 };
 
 export const guestAPI = {
   register: (data) => api.post('/guests/register', data),
-  getByUuid: (uuid) => api.get(`/guests/uuid/${uuid}`),
-  checkIn: (data) => api.post('/guests/check-in', data),
+  getSuccessByUuid: (uuid) => api.get(`/guests/uuid/${uuid}/success`),
 };
 
 export const adminAPI = {
   login: (credentials) => api.post('/admin/login', credentials),
   logout: () => adminPost('/admin/logout', {}),
-  getStats: () => adminGet('/admin/stats'),
   getGuests: () => adminGet('/admin/guests'),
   getGuestsByEvent: (eventId) => adminGet(`/admin/guests/event/${eventId}`),
+  checkIn: (data) => adminPost('/admin/check-in', data),
   getEvents: () => adminGet('/admin/events'),
+  getEvent: (id) => adminGet(`/admin/events/${id}`),
   getRegistrationQr: () => adminGet('/admin/registration-qr'),
-  getShareInfo: () => adminGet('/admin/share'),
-  sendEmailInvite: (data) => adminPost('/admin/share/email', data),
-  createEvent: (data) => adminPost('/admin/events', data),
-  updateEvent: (id, data) => api.put(`/admin/events/${id}`, data, { headers: buildAuthHeaders() || {} }),
+  getGuestAssets: (id) => adminGet(`/admin/guests/${id}/assets`),
+  updateGuestAttendance: (id, isAttended) => adminPatch(`/admin/guests/${id}/attendance`, { is_attended: isAttended }),
+  createEvent: (formData) => adminPost('/admin/events', formData),
+  updateEvent: (id, formData) => adminPut(`/admin/events/${id}`, formData),
+  setActiveEvent: (id) => adminPost(`/admin/events/${id}/set-active`, {}),
+  duplicateEvent: (id) => adminPost(`/admin/events/${id}/duplicate`, {}),
+  archiveEvent: (id) => adminPost(`/admin/events/${id}/archive`, {}),
+  deleteEvent: (id) => adminDelete(`/admin/events/${id}`),
 };
 
 export const getUploadUrl = (path) => {

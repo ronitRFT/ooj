@@ -20,7 +20,7 @@ async function testConnection() {
     return true;
   } catch (error) {
     console.error('MySQL connection failed:', error.message);
-    return false;
+    throw error;
   }
 }
 

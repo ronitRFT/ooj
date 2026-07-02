@@ -38,7 +38,8 @@ function buildRegistrationInviteHtml(event, registrationUrl, recipientName) {
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#1a0a2e;border-radius:12px;overflow:hidden;">
           <tr>
             <td style="background:linear-gradient(135deg,#2d1b4e,#1a0a2e);padding:32px 24px;text-align:center;border-bottom:3px solid #d4af37;">
-              <p style="margin:0 0 8px;color:#d4af37;font-size:12px;letter-spacing:4px;text-transform:uppercase;">You're Invited</p>
+              <p style="margin:0 0 8px;color:${event?.theme_secondary || '#d4af37'};font-size:12px;letter-spacing:4px;text-transform:uppercase;">You're Invited</p>
+              ${event?.subtitle ? `<p style="margin:0 0 8px;color:#aaa;font-size:14px;font-style:italic;">${escapeHtml(event.subtitle)}</p>` : ''}
               <h1 style="margin:0;color:#ffffff;font-size:26px;font-weight:normal;line-height:1.3;">${title}</h1>
             </td>
           </tr>
@@ -66,7 +67,7 @@ function buildRegistrationInviteHtml(event, registrationUrl, recipientName) {
                   </td>
                 </tr>
               </table>` : ''}
-              <a href="${url}" style="display:inline-block;background:#d4af37;color:#1a0a2e;padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;letter-spacing:0.5px;">
+              <a href="${url}" style="display:inline-block;background:${event?.theme_secondary || '#d4af37'};color:${event?.theme_primary || '#1a0a2e'};padding:16px 40px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;letter-spacing:0.5px;">
                 Register Now
               </a>
               <p style="margin:28px 0 0;color:#888888;font-size:12px;line-height:1.6;word-break:break-all;">

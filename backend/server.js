@@ -4,6 +4,7 @@ const path = require('path');
 require('dotenv').config();
 
 const { testConnection } = require('./config/db');
+const { assertJwtSecretConfigured } = require('./utils/auth');
 const { verifyMailConnection } = require('./config/mail');
 const { ensureUploadDirs } = require('./utils/paths');
 const { ensureEventRegistrationQr } = require('./utils/eventQr');
@@ -38,6 +39,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 async function startServer() {
+  assertJwtSecretConfigured();
   await testConnection();
   await verifyMailConnection().catch(() => {
     console.warn('Email verification skipped — server will continue without email');
@@ -67,4 +69,7 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
-startServer();
+startServer().catch((error) => {
+  console.error('Failed to start server:', error.message);
+  process.exit(1);
+});

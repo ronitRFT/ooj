@@ -22,9 +22,15 @@ export default function AdminNavbar() {
     <nav className="admin-navbar">
       <div className="admin-navbar-inner">
         <Link to="/admin/dashboard" className="admin-navbar-brand">
-          <span className="brand-accent">OOJ</span> Admin
+          <span className="brand-accent">OOJ</span> Foundation Admin
         </Link>
         <div className="admin-navbar-links">
+          <Link
+            to="/admin/events"
+            className={isActive('/admin/events') ? 'active' : ''}
+          >
+            Events
+          </Link>
           <Link
             to="/admin/dashboard"
             className={isActive('/admin/dashboard') ? 'active' : ''}

@@ -3,9 +3,7 @@ const eventController = require('../controllers/eventController');
 
 const router = express.Router();
 
+// Public: active event only (registration & landing pages)
 router.get('/active', eventController.getActiveEvent);
-router.get('/registration-qr', eventController.getRegistrationQr);
-router.get('/', eventController.getAllEvents);
-router.get('/:id', eventController.getEventById);
 
 module.exports = router;

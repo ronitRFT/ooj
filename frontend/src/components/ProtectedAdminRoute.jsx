@@ -1,10 +1,12 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { isStoredAdminTokenValid } from '../utils/adminAuth';
+import { clearAdminToken } from '../services/api';
 
 export default function ProtectedAdminRoute() {
   const location = useLocation();
-  const token = localStorage.getItem('adminToken');
 
-  if (!token) {
+  if (!isStoredAdminTokenValid()) {
+    clearAdminToken();
     return <Navigate to="/admin/login" replace state={{ from: location }} />;
   }
 

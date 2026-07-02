@@ -4,7 +4,15 @@ const crypto = require('crypto');
 const JWT_EXPIRES_IN = '24h';
 
 function getJwtSecret() {
-  return process.env.JWT_SECRET || 'change_this_secret_in_production';
+  const secret = process.env.JWT_SECRET;
+  if (!secret || !String(secret).trim()) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  return secret;
+}
+
+function assertJwtSecretConfigured() {
+  getJwtSecret();
 }
 
 function hashPassword(password) {
@@ -31,4 +39,5 @@ module.exports = {
   generateToken,
   verifyToken,
   parseToken,
+  assertJwtSecretConfigured,
 };

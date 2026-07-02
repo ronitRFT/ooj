@@ -1,35 +1,37 @@
 .stats-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 24px;
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 32px 28px;
   text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.stats-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
 
 .stats-value {
   display: block;
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 2.75rem;
+  font-weight: 600;
+  color: var(--text);
   line-height: 1;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .stats-label {
-  font-size: 0.85rem;
-  color: #888;
+  font-size: 0.8rem;
+  color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.1em;
+  font-weight: 500;
 }
 
-.stats-card.accent .stats-value {
-  color: #e94560;
-}
-
-.stats-card.success .stats-value {
-  color: #2ed573;
-}
-
-.stats-card.warning .stats-value {
-  color: #ffa502;
-}
+.stats-card.primary .stats-value { color: var(--primary); }
+.stats-card.success .stats-value { color: #059669; }
+.stats-card.gold .stats-value { color: var(--secondary); }
+.stats-card.muted .stats-value { color: var(--text-muted); }

@@ -1,9 +1,12 @@
 const path = require('path');
 const fs = require('fs');
-const { invitationsDir, assetsDir, fileToDataUri } = require('./paths');
-
-const YOGI_JI_MESSAGE =
-  'With the divine blessings of Yogi Ji, the OOJ Foundation warmly welcomes you to this sacred gathering. May this event bring peace, wisdom, and unity to all who attend.';
+const { invitationsDir, assetsDir, fileToDataUri, getMimeType } = require('./paths');
+const {
+  resolveEventTheme,
+  resolveInvitationText,
+  resolveYogiName,
+  resolveHostName,
+} = require('./eventTheme');
 
 function escapeHtml(text) {
   if (!text) return '';
@@ -12,6 +15,13 @@ function escapeHtml(text) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function truncateText(text, maxLen = 160) {
+  if (!text) return '';
+  const trimmed = String(text).trim();
+  if (trimmed.length <= maxLen) return trimmed;
+  return `${trimmed.slice(0, maxLen).trim()}…`;
 }
 
 function formatEventDate(eventDate) {
@@ -25,35 +35,52 @@ function formatEventDate(eventDate) {
   });
 }
 
-function resolveBannerDataUri(event) {
-  if (event.banner_image) {
-    const bannerPath = path.join(__dirname, '..', event.banner_image.replace(/^\//, ''));
-    if (fs.existsSync(bannerPath)) {
-      const ext = path.extname(bannerPath).toLowerCase();
-      const mime = ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : 'image/svg+xml';
-      return fileToDataUri(bannerPath, mime);
+function resolveImageDataUri(imagePath, fallbackPath) {
+  if (imagePath) {
+    const fullPath = path.join(__dirname, '..', imagePath.replace(/^\//, ''));
+    if (fs.existsSync(fullPath)) {
+      return fileToDataUri(fullPath, getMimeType(fullPath));
     }
   }
-
-  const defaultBanner = path.join(assetsDir, 'default-banner.svg');
-  return fileToDataUri(defaultBanner, 'image/svg+xml');
+  if (fallbackPath && fs.existsSync(fallbackPath)) {
+    return fileToDataUri(fallbackPath, getMimeType(fallbackPath));
+  }
+  return null;
 }
 
-function resolveLogoDataUri() {
-  const logoPath = path.join(assetsDir, 'ooj-logo.svg');
-  return fileToDataUri(logoPath, 'image/svg+xml');
+function resolveBannerDataUri(event) {
+  return resolveImageDataUri(
+    event?.banner_image,
+    path.join(assetsDir, 'default-banner.svg')
+  );
+}
+
+function resolveLogoDataUri(event) {
+  return resolveImageDataUri(
+    event?.logo_image,
+    path.join(assetsDir, 'ooj-logo.svg')
+  );
 }
 
 function resolveQrDataUri(qrCodePath) {
+  if (!qrCodePath) return null;
   const qrFullPath = path.join(__dirname, '..', qrCodePath.replace(/^\//, ''));
+  if (!fs.existsSync(qrFullPath)) return null;
   return fileToDataUri(qrFullPath, 'image/png');
 }
 
 function buildInvitationHtml(guest, event, qrCodePath) {
   const eventDate = formatEventDate(event.event_date);
-  const logoUri = resolveLogoDataUri();
+  const logoUri = resolveLogoDataUri(event);
   const bannerUri = resolveBannerDataUri(event);
   const qrUri = resolveQrDataUri(qrCodePath);
+  const yogiMessage = truncateText(resolveInvitationText(event), 150);
+  const yogiName = resolveYogiName(event);
+  const theme = resolveEventTheme(event);
+  const primary = theme.primary;
+  const secondary = theme.secondary;
+  const accent = theme.accent;
+  const hostName = resolveHostName(event);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -61,215 +88,333 @@ function buildInvitationHtml(guest, event, qrCodePath) {
   <meta charset="UTF-8">
   <title>Invitation - ${escapeHtml(event.title)}</title>
   <style>
-    @page { size: A4; margin: 0; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Georgia', 'Times New Roman', serif;
-      background: #f8f4ef;
-      color: #1a1a2e;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 24px;
+    @page {
+      size: A4 portrait;
+      margin: 0;
     }
-    .invitation {
-      width: 100%;
-      max-width: 680px;
-      background: #ffffff;
-      border-radius: 4px;
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    html, body {
+      width: 210mm;
+      height: 297mm;
       overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-      border: 2px solid #d4af37;
     }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: #faf7f2;
+      color: ${primary};
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .invitation {
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 2px solid ${secondary};
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
     .banner {
       width: 100%;
-      height: 180px;
+      height: 48mm;
       object-fit: cover;
       display: block;
+      flex-shrink: 0;
     }
-    .logo-section {
-      text-align: center;
-      padding: 24px 32px 16px;
-      background: linear-gradient(180deg, #fff 0%, #faf8f5 100%);
-      border-bottom: 1px solid #eee;
+
+    .banner-placeholder {
+      height: 48mm;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, ${accent} 0%, ${secondary}33 100%);
     }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 4mm;
+      padding: 3mm 6mm;
+      border-bottom: 1px solid ${secondary}44;
+      flex-shrink: 0;
+    }
+
     .logo {
-      width: 90px;
-      height: 90px;
-      margin: 0 auto 8px;
-      display: block;
+      width: 14mm;
+      height: 14mm;
+      object-fit: contain;
+      flex-shrink: 0;
     }
+
+    .header-text {
+      flex: 1;
+      min-width: 0;
+    }
+
     .foundation-name {
-      font-size: 13px;
-      letter-spacing: 4px;
+      font-size: 8pt;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: #b8860b;
+      color: ${secondary};
       font-weight: 600;
     }
-    .invite-label {
+
+    .subtitle {
+      font-size: 7.5pt;
+      color: #666;
+      font-style: italic;
+      margin-top: 1mm;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .main {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 4mm 6mm 3mm;
+      gap: 3mm;
+    }
+
+    .invite-block {
       text-align: center;
-      padding: 20px 32px 8px;
-      font-size: 12px;
-      letter-spacing: 5px;
+      flex-shrink: 0;
+    }
+
+    .invite-label {
+      font-size: 7pt;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: #888;
     }
+
     .guest-name {
-      text-align: center;
-      font-size: 32px;
-      color: #1a0a2e;
-      padding: 0 32px 8px;
+      font-size: 16pt;
+      color: ${primary};
       font-weight: normal;
       font-style: italic;
+      line-height: 1.15;
+      margin: 1mm 0;
+      max-height: 12mm;
+      overflow: hidden;
     }
+
     .honorific {
-      text-align: center;
-      font-size: 14px;
+      font-size: 8pt;
       color: #666;
-      padding-bottom: 20px;
     }
+
     .event-title {
-      text-align: center;
-      font-size: 22px;
-      color: #2d1b4e;
-      padding: 16px 32px;
-      background: linear-gradient(90deg, rgba(212,175,55,0.08) 0%, rgba(255,153,51,0.08) 50%, rgba(212,175,55,0.08) 100%);
-      border-top: 1px solid #f0e6d3;
-      border-bottom: 1px solid #f0e6d3;
+      font-size: 12pt;
+      color: ${primary};
+      padding: 2mm 3mm;
+      margin-top: 1.5mm;
+      background: linear-gradient(90deg, ${secondary}18 0%, ${accent}55 50%, ${secondary}18 100%);
+      border-top: 1px solid ${secondary}33;
+      border-bottom: 1px solid ${secondary}33;
+      line-height: 1.2;
+      max-height: 14mm;
+      overflow: hidden;
     }
+
+    .host-line {
+      font-size: 7.5pt;
+      color: #666;
+      margin-top: 1mm;
+    }
+
     .details {
-      padding: 28px 48px;
       display: grid;
-      gap: 18px;
+      gap: 2.5mm;
+      flex-shrink: 0;
     }
+
     .detail-row {
       display: flex;
       align-items: flex-start;
-      gap: 16px;
+      gap: 3mm;
     }
+
     .detail-icon {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, #d4af37, #f5e6a3);
+      width: 7mm;
+      height: 7mm;
+      background: ${secondary};
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 9pt;
       flex-shrink: 0;
     }
+
     .detail-content strong {
       display: block;
-      font-size: 10px;
-      letter-spacing: 2px;
+      font-size: 6.5pt;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      color: #b8860b;
-      margin-bottom: 4px;
+      color: ${secondary};
+      margin-bottom: 0.5mm;
     }
+
     .detail-content span {
-      font-size: 15px;
+      font-size: 8.5pt;
       color: #333;
-      line-height: 1.5;
+      line-height: 1.35;
     }
+
     .yogi-message {
-      margin: 0 32px 28px;
-      padding: 24px 28px;
-      background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 100%);
-      border-radius: 8px;
-      border-left: 4px solid #d4af37;
-      color: #f5e6a3;
-      font-size: 14px;
-      line-height: 1.8;
+      flex: 1;
+      min-height: 0;
+      max-height: 38mm;
+      padding: 2.5mm 3mm;
+      background: linear-gradient(135deg, ${primary} 0%, ${primary}ee 100%);
+      border-left: 3px solid ${secondary};
+      color: #fff;
+      font-size: 8pt;
+      line-height: 1.45;
       font-style: italic;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      overflow: hidden;
     }
+
     .yogi-message .sign-off {
       display: block;
-      margin-top: 12px;
+      margin-top: 2mm;
       font-style: normal;
-      font-size: 12px;
-      letter-spacing: 2px;
-      color: #d4af37;
+      font-size: 6.5pt;
+      letter-spacing: 0.1em;
+      color: ${secondary};
       text-transform: uppercase;
     }
+
+    .bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4mm;
+      padding: 3mm 6mm 4mm;
+      border-top: 1px solid ${secondary}33;
+      background: #faf8f5;
+      flex-shrink: 0;
+    }
+
     .qr-section {
       text-align: center;
-      padding: 24px 32px 32px;
-      background: #faf8f5;
-      border-top: 1px solid #f0e6d3;
+      flex-shrink: 0;
     }
+
     .qr-section img {
-      width: 140px;
-      height: 140px;
-      padding: 10px;
+      width: 26mm;
+      height: 26mm;
+      padding: 1.5mm;
       background: #fff;
-      border: 2px solid #d4af37;
-      border-radius: 8px;
+      border: 1.5px solid ${secondary};
+      border-radius: 2mm;
+      display: block;
     }
+
     .qr-label {
-      margin-top: 12px;
-      font-size: 11px;
-      letter-spacing: 2px;
+      margin-top: 1.5mm;
+      font-size: 6pt;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #888;
+      max-width: 32mm;
+      line-height: 1.3;
     }
-    .footer {
-      text-align: center;
-      padding: 16px;
-      background: #1a0a2e;
-      color: #888;
-      font-size: 10px;
-      letter-spacing: 1px;
+
+    .footer-meta {
+      flex: 1;
+      font-size: 6.5pt;
+      color: #666;
+      line-height: 1.45;
     }
-    .footer span { color: #d4af37; }
+
+    .footer-meta strong {
+      display: block;
+      color: ${primary};
+      font-size: 7pt;
+      margin-bottom: 1mm;
+    }
+
+    .footer-id {
+      font-size: 5.5pt;
+      color: #999;
+      margin-top: 1mm;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
   <div class="invitation">
-    <img class="banner" src="${bannerUri}" alt="Event Banner" />
-    <div class="logo-section">
-      <img class="logo" src="${logoUri}" alt="OOJ Foundation Logo" />
-      <p class="foundation-name">OOJ Foundation</p>
-    </div>
-    <p class="invite-label">You Are Cordially Invited</p>
-    <h1 class="guest-name">${escapeHtml(guest.full_name)}</h1>
-    <p class="honorific">We request the pleasure of your company at</p>
-    <h2 class="event-title">${escapeHtml(event.title)}</h2>
-    <div class="details">
-      <div class="detail-row">
-        <div class="detail-icon">📅</div>
-        <div class="detail-content">
-          <strong>Date &amp; Time</strong>
-          <span>${escapeHtml(eventDate)}</span>
-        </div>
+    ${bannerUri
+      ? `<img class="banner" src="${bannerUri}" alt="Event Banner" />`
+      : '<div class="banner-placeholder"></div>'}
+
+    <div class="header">
+      ${logoUri ? `<img class="logo" src="${logoUri}" alt="Logo" />` : ''}
+      <div class="header-text">
+        <p class="foundation-name">${escapeHtml(hostName)}</p>
+        ${event.subtitle ? `<p class="subtitle">${escapeHtml(event.subtitle)}</p>` : ''}
       </div>
-      <div class="detail-row">
-        <div class="detail-icon">📍</div>
-        <div class="detail-content">
-          <strong>Venue</strong>
-          <span>${escapeHtml(event.venue)}</span>
-        </div>
+    </div>
+
+    <div class="main">
+      <div class="invite-block">
+        <p class="invite-label">You Are Cordially Invited</p>
+        <h1 class="guest-name">${escapeHtml(guest.full_name)}</h1>
+        <p class="honorific">We request the pleasure of your company at</p>
+        <h2 class="event-title">${escapeHtml(event.title)}</h2>
+        ${event.host_name ? `<p class="host-line">Hosted by ${escapeHtml(event.host_name)}</p>` : ''}
       </div>
-      ${guest.organization ? `
-      <div class="detail-row">
-        <div class="detail-icon">🏛</div>
-        <div class="detail-content">
-          <strong>Organization</strong>
-          <span>${escapeHtml(guest.organization)}</span>
+
+      <div class="details">
+        <div class="detail-row">
+          <div class="detail-icon">📅</div>
+          <div class="detail-content"><strong>Date &amp; Time</strong><span>${escapeHtml(eventDate)}</span></div>
         </div>
-      </div>` : ''}
+        <div class="detail-row">
+          <div class="detail-icon">📍</div>
+          <div class="detail-content"><strong>Venue</strong><span>${escapeHtml(event.venue)}</span></div>
+        </div>
+        ${event.rsvp_contact ? `<div class="detail-row"><div class="detail-icon">📞</div><div class="detail-content"><strong>RSVP</strong><span>${escapeHtml(event.rsvp_contact)}</span></div></div>` : ''}
+        ${guest.organization ? `<div class="detail-row"><div class="detail-icon">🏛</div><div class="detail-content"><strong>Organization</strong><span>${escapeHtml(guest.organization)}</span></div></div>` : ''}
+      </div>
+
+      <blockquote class="yogi-message">
+        "${escapeHtml(yogiMessage)}"
+        <span class="sign-off">— With Blessings, ${escapeHtml(yogiName)}</span>
+      </blockquote>
     </div>
-    <blockquote class="yogi-message">
-      "${escapeHtml(YOGI_JI_MESSAGE)}"
-      <span class="sign-off">— With Blessings, Yogi Ji</span>
-    </blockquote>
-    <div class="qr-section">
-      <img src="${qrUri}" alt="Check-in QR Code" />
-      <p class="qr-label">Present this QR code at the entrance</p>
-    </div>
-    <div class="footer">
-      <span>OOJ Foundation</span> &bull; Event Management &bull; ${escapeHtml(guest.uuid)}
+
+    <div class="bottom-row">
+      <div class="footer-meta">
+        <strong>${escapeHtml(hostName)}</strong>
+        Present this invitation at the venue entrance for check-in.
+        <div class="footer-id">Guest ID: ${escapeHtml(guest.uuid)}</div>
+      </div>
+      <div class="qr-section">
+        ${qrUri
+    ? `<img src="${qrUri}" alt="Check-in QR Code" />`
+    : '<div style="width:26mm;height:26mm;border:1.5px dashed #ccc;border-radius:2mm;"></div>'}
+        <p class="qr-label">Scan for check-in</p>
+      </div>
     </div>
   </div>
 </body>
@@ -279,18 +424,8 @@ function buildInvitationHtml(guest, event, qrCodePath) {
 async function generateInvitationCard(guest, event, qrCodePath) {
   const htmlFileName = `invitation-${guest.uuid}.html`;
   const htmlFilePath = path.join(invitationsDir, htmlFileName);
-  const html = buildInvitationHtml(guest, event, qrCodePath);
-
-  fs.writeFileSync(htmlFilePath, html, 'utf8');
-
-  return {
-    htmlPath: `/uploads/invitations/${htmlFileName}`,
-    htmlFilePath,
-  };
+  fs.writeFileSync(htmlFilePath, buildInvitationHtml(guest, event, qrCodePath), 'utf8');
+  return { htmlPath: `/uploads/invitations/${htmlFileName}`, htmlFilePath };
 }
 
-module.exports = {
-  buildInvitationHtml,
-  generateInvitationCard,
-  YOGI_JI_MESSAGE,
-};
+module.exports = { buildInvitationHtml, generateInvitationCard };
