@@ -1,0 +1,77 @@
+.qr-display {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 40px 32px;
+  max-width: 420px;
+  width: 100%;
+}
+
+.qr-success-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(46, 213, 115, 0.15);
+  color: #2ed573;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin: 0 auto 16px;
+}
+
+.qr-display h2 {
+  margin: 0 0 8px;
+}
+
+.qr-guest-name {
+  font-size: 1.25rem;
+  color: #e94560;
+  margin: 0 0 4px;
+}
+
+.qr-event {
+  color: #888;
+  margin: 0 0 24px;
+  font-size: 0.9rem;
+}
+
+.qr-image-wrap {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.qr-image {
+  width: 200px;
+  height: 200px;
+  display: block;
+}
+
+.qr-instruction {
+  color: #aaa;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.qr-uuid {
+  font-size: 0.75rem;
+  color: #555;
+  margin-bottom: 24px;
+  font-family: monospace;
+}
+
+.download-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.download-actions .btn {
+  width: 100%;
+}

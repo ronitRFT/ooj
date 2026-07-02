@@ -1,0 +1,134 @@
+.guest-management {
+  margin-bottom: 40px;
+}
+
+.gm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.gm-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.gm-subtitle {
+  margin: 0;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.gm-subtitle strong {
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+.gm-stat.registered {
+  color: #ffa502;
+}
+
+.gm-stat.checked-in {
+  color: #2ed573;
+}
+
+.gm-refresh-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.gm-refreshing {
+  font-size: 0.8rem;
+  color: #e94560;
+}
+
+.gm-last-updated {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.gm-refresh-btn {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.gm-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+}
+
+.gm-filter-group label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.gm-filter-group input,
+.gm-filter-group select {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.gm-filter-group input:focus,
+.gm-filter-group select:focus {
+  outline: none;
+  border-color: #e94560;
+}
+
+.gm-filter-group input::placeholder {
+  color: #555;
+}
+
+.gm-filter-group select option {
+  background: #1a1a2e;
+}
+
+.gm-loading {
+  text-align: center;
+  padding: 48px 24px;
+  color: #888;
+}
+
+.gm-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(233, 69, 96, 0.2);
+  border-top-color: #e94560;
+  border-radius: 50%;
+  animation: gm-spin 0.7s linear infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes gm-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  .gm-header {
+    flex-direction: column;
+  }
+
+  .gm-refresh-info {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

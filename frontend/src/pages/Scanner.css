@@ -1,0 +1,237 @@
+.scanner-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 16px 32px;
+  min-height: calc(100dvh - 64px - 60px);
+  display: flex;
+  flex-direction: column;
+}
+
+.scanner-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.scanner-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+}
+
+.scanner-header p {
+  color: #888;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.scanner-viewport {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+  border: 2px solid rgba(233, 69, 96, 0.3);
+  aspect-ratio: 1;
+  max-height: min(72dvh, 480px);
+  margin: 0 auto 16px;
+}
+
+.scanner-region {
+  width: 100%;
+  height: 100%;
+}
+
+.scanner-region video {
+  object-fit: cover !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.scanner-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  z-index: 10;
+}
+
+.scanner-overlay.error p {
+  color: #e94560;
+  margin-bottom: 8px;
+}
+
+.scanner-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(233, 69, 96, 0.2);
+  border-top-color: #e94560;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.scan-frame-hint {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.scan-result {
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scan-result--success {
+  background: rgba(46, 213, 115, 0.1);
+  border: 2px solid rgba(46, 213, 115, 0.35);
+}
+
+.scan-result--already_checked_in {
+  background: rgba(255, 165, 2, 0.1);
+  border: 2px solid rgba(255, 165, 2, 0.35);
+}
+
+.scan-result--invalid {
+  background: rgba(233, 69, 96, 0.1);
+  border: 2px solid rgba(233, 69, 96, 0.35);
+}
+
+.scan-result-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 auto 12px;
+}
+
+.scan-result--success .scan-result-icon {
+  background: rgba(46, 213, 115, 0.2);
+  color: #2ed573;
+}
+
+.scan-result--already_checked_in .scan-result-icon {
+  background: rgba(255, 165, 2, 0.2);
+  color: #ffa502;
+}
+
+.scan-result--invalid .scan-result-icon {
+  background: rgba(233, 69, 96, 0.2);
+  color: #e94560;
+}
+
+.scan-result h2 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.scan-result--success h2 { color: #2ed573; }
+.scan-result--already_checked_in h2 { color: #ffa502; }
+.scan-result--invalid h2 { color: #e94560; }
+
+.scan-result-guest {
+  margin: 8px 0 12px;
+}
+
+.scan-result-guest .guest-name {
+  font-size: 1.1rem;
+  color: #fff;
+  margin: 0;
+}
+
+.scan-result-guest .guest-org {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 4px 0 0;
+}
+
+.scan-resume-hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0 0 12px;
+}
+
+.scan-next-btn {
+  width: 100%;
+}
+
+.scanner-actions {
+  margin-bottom: 12px;
+}
+
+.scanner-actions .btn {
+  width: 100%;
+}
+
+.manual-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.manual-form input {
+  width: 100%;
+  padding: 14px 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 1rem;
+  -webkit-appearance: none;
+}
+
+.manual-form input:focus {
+  outline: none;
+  border-color: #e94560;
+}
+
+.manual-form .btn {
+  width: 100%;
+  padding: 14px;
+}
+
+@media (max-width: 400px) {
+  .scanner-page {
+    padding: 12px 12px 24px;
+  }
+
+  .scanner-header h1 {
+    font-size: 1.2rem;
+  }
+}

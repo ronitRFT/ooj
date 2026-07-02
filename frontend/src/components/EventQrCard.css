@@ -1,0 +1,111 @@
+.event-qr-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 40px;
+}
+
+.event-qr-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.event-qr-header p {
+  margin: 0;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.event-qr-body {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 32px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.event-qr-image-wrap {
+  text-align: center;
+}
+
+.event-qr-image {
+  width: 200px;
+  height: 200px;
+  background: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.event-qr-scan-hint {
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: #666;
+  max-width: 200px;
+  line-height: 1.5;
+}
+
+.event-qr-details h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  color: #e94560;
+}
+
+.event-qr-meta {
+  margin: 0 0 4px;
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.event-qr-url {
+  margin: 20px 0;
+}
+
+.event-qr-url label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.event-qr-url code {
+  display: block;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: #ccc;
+  word-break: break-all;
+}
+
+.event-qr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.event-qr-actions .btn {
+  flex: 1;
+  min-width: 140px;
+}
+
+@media (max-width: 700px) {
+  .event-qr-body {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .event-qr-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .event-qr-actions .btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,20 @@
+.admin-public-page .admin-page-title {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+}
+
+.admin-public-page .admin-page-subtitle {
+  margin: 0 0 20px;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.admin-public-page .register-page,
+.admin-public-page .scanner-page {
+  min-height: auto;
+  padding-top: 0;
+}
+
+.admin-public-page .page-center {
+  min-height: auto;
+}
