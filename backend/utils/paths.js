@@ -27,6 +27,7 @@ function getMimeType(filePath) {
   if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
   if (ext === '.webp') return 'image/webp';
   if (ext === '.svg') return 'image/svg+xml';
+  if (ext === '.pdf') return 'application/pdf';
   return 'application/octet-stream';
 }
 

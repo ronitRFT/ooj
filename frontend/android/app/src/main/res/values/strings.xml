@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">OOJ Foundation Events</string>
+    <string name="title_activity_main">OOJ Foundation Events</string>
+    <string name="package_name">org.oojfoundation.events</string>
+    <string name="custom_url_scheme">org.oojfoundation.events</string>
+</resources>

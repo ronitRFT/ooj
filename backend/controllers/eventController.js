@@ -1,5 +1,6 @@
 const eventService = require('../services/eventService');
 const { sendSuccess, sendError } = require('../utils/apiResponse');
+const { sendInternalError } = require('../utils/safeError');
 
 function businessRuleStatus(message) {
   if (
@@ -26,7 +27,7 @@ async function getActiveEvent(req, res) {
     }
     return sendSuccess(res, 200, { data: event });
   } catch (error) {
-    return sendError(res, 500, { message: error.message });
+    return sendInternalError(res, 'getActiveEvent', error);
   }
 }
 
@@ -35,7 +36,7 @@ async function getAllEvents(req, res) {
     const events = await eventService.getAllEvents();
     return sendSuccess(res, 200, { data: events });
   } catch (error) {
-    return sendError(res, 500, { message: error.message });
+    return sendInternalError(res, 'getAllEvents', error);
   }
 }
 
@@ -47,7 +48,7 @@ async function getEventById(req, res) {
     }
     return sendSuccess(res, 200, { data: event });
   } catch (error) {
-    return sendError(res, 500, { message: error.message });
+    return sendInternalError(res, 'getEventById', error);
   }
 }
 
@@ -58,7 +59,10 @@ async function createEvent(req, res) {
   } catch (error) {
     const status = businessRuleStatus(error.message)
       || (error.message.includes('required') ? 400 : 500);
-    return sendError(res, status, { message: error.message });
+    if (status === 400) {
+      return sendError(res, status, { message: error.message });
+    }
+    return sendInternalError(res, 'createEvent', error, 'Failed to create event');
   }
 }
 
@@ -70,8 +74,11 @@ async function updateEvent(req, res) {
     }
     return sendSuccess(res, 200, { data: event });
   } catch (error) {
-    const status = businessRuleStatus(error.message) || 500;
-    return sendError(res, status, { message: error.message });
+    const status = businessRuleStatus(error.message);
+    if (status === 400) {
+      return sendError(res, status, { message: error.message });
+    }
+    return sendInternalError(res, 'updateEvent', error, 'Failed to update event');
   }
 }
 
@@ -86,7 +93,10 @@ async function setActiveEvent(req, res) {
     const status = error.message.includes('not found')
       ? 404
       : (businessRuleStatus(error.message) || 500);
-    return sendError(res, status, { message: error.message });
+    if (status === 404 || status === 400) {
+      return sendError(res, status, { message: error.message });
+    }
+    return sendInternalError(res, 'setActiveEvent', error, 'Failed to activate event');
   }
 }
 
@@ -101,8 +111,11 @@ async function archiveEvent(req, res) {
       data: event,
     });
   } catch (error) {
-    const status = businessRuleStatus(error.message) || 500;
-    return sendError(res, status, { message: error.message });
+    const status = businessRuleStatus(error.message);
+    if (status === 400) {
+      return sendError(res, status, { message: error.message });
+    }
+    return sendInternalError(res, 'archiveEvent', error, 'Failed to archive event');
   }
 }
 
@@ -117,7 +130,7 @@ async function duplicateEvent(req, res) {
       data: event,
     });
   } catch (error) {
-    return sendError(res, 500, { message: error.message });
+    return sendInternalError(res, 'duplicateEvent', error, 'Failed to duplicate event');
   }
 }
 
@@ -129,8 +142,11 @@ async function deleteEvent(req, res) {
     }
     return sendSuccess(res, 200, { message: 'Event deleted' });
   } catch (error) {
-    const status = businessRuleStatus(error.message) || 500;
-    return sendError(res, status, { message: error.message });
+    const status = businessRuleStatus(error.message);
+    if (status === 400) {
+      return sendError(res, status, { message: error.message });
+    }
+    return sendInternalError(res, 'deleteEvent', error, 'Failed to delete event');
   }
 }
 
@@ -149,7 +165,7 @@ async function getRegistrationQr(req, res) {
         : 'No active event. Set an event to Active in Events CMS to enable public registration.',
     });
   } catch (error) {
-    return sendError(res, 500, { message: error.message });
+    return sendInternalError(res, 'getRegistrationQr', error);
   }
 }
 

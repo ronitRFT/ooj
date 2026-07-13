@@ -9,6 +9,17 @@ import {
 
 const ActiveEventContext = createContext(null);
 
+const FALLBACK_ACTIVE_EVENT = {
+  event: null,
+  loading: true,
+  error: '',
+  refetch: async () => {},
+  theme: resolveEventTheme(null),
+  copy: resolveEventCopy(null),
+  assets: resolveEventAssets(null),
+  themeStyle: getEventThemeStyle(null),
+};
+
 export function ActiveEventProvider({ children }) {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -67,7 +78,10 @@ export function ActiveEventProvider({ children }) {
 export function useActiveEvent() {
   const ctx = useContext(ActiveEventContext);
   if (!ctx) {
-    throw new Error('useActiveEvent must be used within ActiveEventProvider');
+    if (import.meta.env.DEV) {
+      console.warn('useActiveEvent called outside ActiveEventProvider — using fallback');
+    }
+    return FALLBACK_ACTIVE_EVENT;
   }
   return ctx;
 }

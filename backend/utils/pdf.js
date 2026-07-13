@@ -26,16 +26,22 @@ async function convertHtmlToPdf(htmlFilePath, pdfFilePath) {
   const page = await browser.newPage();
 
   try {
+    const html = fs.readFileSync(htmlFilePath, 'utf8');
+
     await page.setViewport({
       width: 794,
       height: 1123,
-      deviceScaleFactor: 1,
+      deviceScaleFactor: 2,
     });
 
-    const fileUrl = `file://${path.resolve(htmlFilePath)}`;
-    await page.goto(fileUrl, { waitUntil: 'networkidle0', timeout: 30000 });
+    await page.setContent(html, {
+      waitUntil: 'networkidle0',
+      timeout: 30000,
+    });
 
     await page.emulateMediaType('print');
+
+    await page.evaluate(() => document.fonts?.ready);
 
     await page.pdf({
       path: pdfFilePath,
@@ -59,6 +65,11 @@ async function generateInvitationPdf(htmlFilePath, guestUuid) {
 
   if (!fs.existsSync(pdfFilePath)) {
     throw new Error('PDF generation failed — file not created');
+  }
+
+  const stats = fs.statSync(pdfFilePath);
+  if (stats.size < 1000) {
+    throw new Error('PDF generation failed — file too small');
   }
 
   return `/uploads/invitations/${pdfFileName}`;

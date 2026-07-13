@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { adminAPI, getUploadUrl } from '../services/api';
+import { adminAPI, fetchAuthenticatedAsset } from '../services/api';
 import { downloadFileAsBlob } from '../utils/download';
 import GuestTable, { useFilteredGuests } from './GuestTable';
 import './GuestManagement.css';
@@ -176,6 +176,15 @@ export default function GuestManagement({
   const [attendanceSaving, setAttendanceSaving] = useState(false);
   const [actionError, setActionError] = useState('');
 
+  const closeAssetModal = useCallback(() => {
+    setAssetModal((current) => {
+      if (current?.url?.startsWith('blob:')) {
+        URL.revokeObjectURL(current.url);
+      }
+      return null;
+    });
+  }, []);
+
   const isMounted = useRef(true);
   const showEventColumn = selectedEventId === 'all';
 
@@ -295,8 +304,12 @@ export default function GuestManagement({
     try {
       const { data } = await adminAPI.getGuestAssets(guest.id);
       const payload = data.data;
-      const path = type === 'qr' ? payload.qr_path : payload.invitation_path;
-      const url = path ? getUploadUrl(path) : null;
+      const assetPath = type === 'qr' ? payload.qr_url : payload.invitation_url;
+      let url = null;
+
+      if (assetPath) {
+        url = await fetchAuthenticatedAsset(assetPath);
+      }
 
       if (!url) {
         setAssetModal({
@@ -384,7 +397,7 @@ export default function GuestManagement({
   };
 
   const handleMarkCheckedInFromModal = (guest) => {
-    setAssetModal(null);
+    closeAssetModal();
     setAttendancePending({ guest, checked: true });
   };
 
@@ -476,7 +489,7 @@ export default function GuestManagement({
     <section className="guest-management">
       <GuestAssetModal
         modal={assetModal}
-        onClose={() => setAssetModal(null)}
+        onClose={closeAssetModal}
         onMarkCheckedIn={handleMarkCheckedInFromModal}
       />
 

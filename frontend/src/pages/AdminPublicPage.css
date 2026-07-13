@@ -18,3 +18,14 @@
 .admin-public-page .page-center {
   min-height: auto;
 }
+
+.admin-scanner-page {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  .admin-scanner-page {
+    padding: 0 12px;
+  }
+}

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { getUploadUrl } from '../services/api';
-import { downloadFileAsBlob } from '../utils/download';
+import { useState, useEffect } from 'react';
+import { getApiAssetUrl } from '../services/api';
+import { downloadFileAsBlob, fetchAssetBlob, saveBlobAsDownload } from '../utils/download';
 import './QRDisplay.css';
 
 export default function QRDisplay({
@@ -12,23 +12,84 @@ export default function QRDisplay({
   noticeMessage,
 }) {
   const [downloadError, setDownloadError] = useState('');
+  const [downloadNotice, setDownloadNotice] = useState('');
   const [downloading, setDownloading] = useState(null);
+  const [invitationBlobUrl, setInvitationBlobUrl] = useState(null);
+  const [invitationLoadError, setInvitationLoadError] = useState('');
+  const [invitationBlob, setInvitationBlob] = useState(null);
 
-  const qrUrl = guest.qr_code_path ? getUploadUrl(guest.qr_code_path) : null;
-  const invitationUrl = getUploadUrl(
-    guest.invitation_download_url || guest.invitation_pdf_path || guest.invitation_path,
-  );
+  const qrUrl = getApiAssetUrl(guest.qr_url);
+  const invitationUrl = getApiAssetUrl(guest.invitation_url);
   const eventTitle = copy?.title || event?.title;
   const invitationText = copy?.invitation_text;
   const bannerUrl = assets?.bannerUrl;
   const logoUrl = assets?.logoUrl;
 
-  const handleDownload = async (url, filename, type) => {
-    if (!url) return;
+  useEffect(() => {
+    if (!invitationUrl) {
+      setInvitationBlobUrl(null);
+      setInvitationBlob(null);
+      setInvitationLoadError('');
+      return undefined;
+    }
+
+    let active = true;
+    let blobUrl = null;
+
+    setInvitationLoadError('');
+    fetchAssetBlob(invitationUrl)
+      .then(({ blob, contentType }) => {
+        if (!active) return;
+        if (!contentType.includes('pdf') && !blob.type.includes('pdf')) {
+          throw new Error('Invalid invitation file type');
+        }
+        blobUrl = URL.createObjectURL(blob);
+        setInvitationBlob(blob);
+        setInvitationBlobUrl(blobUrl);
+      })
+      .catch(() => {
+        if (active) {
+          setInvitationLoadError('Unable to load invitation preview. Try downloading instead.');
+          setInvitationBlobUrl(null);
+          setInvitationBlob(null);
+        }
+      });
+
+    return () => {
+      active = false;
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+  }, [invitationUrl]);
+
+  const handleDownloadInvitation = async () => {
     setDownloadError('');
-    setDownloading(type);
+    setDownloadNotice('');
+    setDownloading('pdf');
     try {
-      await downloadFileAsBlob(url, filename);
+      const filename = `invitation-${guest.full_name.replace(/\s+/g, '-')}.pdf`;
+      if (invitationBlob) {
+        saveBlobAsDownload(invitationBlob, filename);
+      } else {
+        const result = await downloadFileAsBlob(invitationUrl, filename);
+        if (result?.method === 'open') {
+          setDownloadNotice('Opened in a new tab — use Share or Save from your browser.');
+          setTimeout(() => setDownloadNotice(''), 5000);
+        }
+      }
+    } catch {
+      setDownloadError('Download failed. Please try again.');
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const handleDownloadQr = async () => {
+    if (!qrUrl) return;
+    setDownloadError('');
+    setDownloadNotice('');
+    setDownloading('qr');
+    try {
+      await downloadFileAsBlob(qrUrl, `qr-${guest.uuid}.png`);
     } catch {
       setDownloadError('Download failed. Please try again.');
     } finally {
@@ -71,13 +132,30 @@ export default function QRDisplay({
       {invitationUrl ? (
         <div className="invitation-preview card">
           <span className="preview-label">Your Invitation</span>
-          <div className="preview-frame">
-            <iframe
-              src={invitationUrl}
-              title="Invitation Preview"
-              className="preview-iframe"
-            />
-          </div>
+          {invitationLoadError && (
+            <p className="qr-missing-notice" role="alert">{invitationLoadError}</p>
+          )}
+          {invitationBlobUrl && (
+            <div className="preview-frame">
+              <object
+                data={invitationBlobUrl}
+                type="application/pdf"
+                className="preview-iframe"
+                aria-label="Invitation PDF preview"
+              >
+                <p className="preview-hint">
+                  PDF preview not supported in this browser.
+                  {' '}
+                  <a href={invitationBlobUrl} target="_blank" rel="noopener noreferrer">
+                    Open invitation
+                  </a>
+                </p>
+              </object>
+            </div>
+          )}
+          {!invitationBlobUrl && !invitationLoadError && (
+            <p className="preview-hint">Loading invitation preview…</p>
+          )}
           <p className="preview-hint">Present your QR code at the venue for check-in</p>
         </div>
       ) : (
@@ -109,6 +187,10 @@ export default function QRDisplay({
 
       <p className="qr-uuid">Guest ID: {guest.uuid}</p>
 
+      {downloadNotice && (
+        <p className="qr-download-notice" role="status">{downloadNotice}</p>
+      )}
+
       {downloadError && (
         <p className="qr-download-error" role="alert">{downloadError}</p>
       )}
@@ -117,11 +199,7 @@ export default function QRDisplay({
         {invitationUrl && (
           <button
             type="button"
-            onClick={() => handleDownload(
-              invitationUrl,
-              `invitation-${guest.full_name.replace(/\s+/g, '-')}.pdf`,
-              'pdf',
-            )}
+            onClick={handleDownloadInvitation}
             className="btn btn-primary"
             disabled={downloading === 'pdf'}
           >
@@ -131,7 +209,7 @@ export default function QRDisplay({
         {qrUrl && (
           <button
             type="button"
-            onClick={() => handleDownload(qrUrl, `qr-${guest.uuid}.png`, 'qr')}
+            onClick={handleDownloadQr}
             className="btn btn-secondary"
             disabled={downloading === 'qr'}
           >

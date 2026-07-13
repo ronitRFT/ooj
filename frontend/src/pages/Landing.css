@@ -97,6 +97,10 @@
   flex-wrap: wrap;
 }
 
+.hero-actions .btn {
+  min-height: var(--touch-min);
+}
+
 .hero-actions .btn-secondary {
   background: rgba(255, 255, 255, 0.95);
   border-color: transparent;
@@ -372,7 +376,24 @@
 
 @media (max-width: 768px) {
   .landing-hero {
-    min-height: 75vh;
+    min-height: 70vh;
+  }
+
+  .hero-content {
+    padding: 48px 20px 40px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    min-width: 0;
   }
 
   .section-split {
@@ -392,6 +413,11 @@
 
   .rsvp-actions {
     justify-content: center;
+    flex-direction: column;
+  }
+
+  .rsvp-actions .btn {
+    width: 100%;
   }
 
   .rsvp-qr-wrap {
@@ -399,6 +425,12 @@
   }
 
   .landing-section {
-    padding: 60px 20px;
+    padding: 48px 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-title {
+    font-size: 2rem;
   }
 }

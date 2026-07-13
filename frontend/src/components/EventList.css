@@ -72,15 +72,16 @@
 }
 
 .action-btn {
-  padding: 5px 12px;
+  padding: 8px 14px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-soft);
   background: var(--white);
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-family: var(--font-sans);
   cursor: pointer;
   transition: all var(--transition);
+  min-height: var(--touch-min);
 }
 
 .action-btn:hover {
@@ -103,4 +104,71 @@
   text-align: center;
   color: var(--text-muted);
   padding: 48px;
+}
+
+.event-list-mobile {
+  display: none;
+}
+
+.event-card {
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.event-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.event-card-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-family: var(--font-serif);
+  color: var(--text);
+}
+
+.event-card-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.event-card-row span {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.event-card .event-actions {
+  margin-top: 12px;
+}
+
+.event-card .action-btn {
+  min-height: var(--touch-min);
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  flex: 1 1 calc(50% - 6px);
+}
+
+@media (max-width: 768px) {
+  .event-list-desktop {
+    display: none;
+  }
+
+  .event-list-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 }

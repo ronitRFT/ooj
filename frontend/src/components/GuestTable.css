@@ -62,14 +62,19 @@
 }
 
 .guest-action-btn {
-  padding: 6px 10px;
-  font-size: 0.75rem;
+  padding: 10px 14px;
+  font-size: 0.85rem;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-sm);
   background: var(--white);
   color: var(--text);
   cursor: pointer;
   transition: background 0.15s ease;
+  min-height: var(--touch-min);
+}
+
+.guest-card .guest-action-btn {
+  width: 100%;
 }
 
 .guest-action-btn:hover:not(:disabled) {
@@ -97,9 +102,13 @@
 }
 
 .guest-attendance-toggle input {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   accent-color: #059669;
+}
+
+.guest-card .guest-actions {
+  margin-top: 12px;
 }
 
 .cell-name {

@@ -155,6 +155,8 @@ export default function RegistrationForm() {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="your@email.com"
+          inputMode="email"
+          autoComplete="email"
           aria-invalid={Boolean(fieldErrors.email)}
         />
         {fieldErrors.email && (
@@ -172,6 +174,8 @@ export default function RegistrationForm() {
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="10–15 digits (optional)"
+          inputMode="tel"
+          autoComplete="tel"
           aria-invalid={Boolean(fieldErrors.phone)}
         />
         {fieldErrors.phone && (

@@ -26,9 +26,27 @@ function formatCameraLabel(camera, index) {
   return `Camera ${index + 1}`;
 }
 
+async function requestCameraPermission() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    return false;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false,
+    });
+    stream.getTracks().forEach((track) => track.stop());
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default function Scanner({ embedded = false }) {
   const isSecureContext = window.isSecureContext;
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  const httpsUrl = `https://${window.location.hostname}:5173${window.location.pathname}`;
 
   const [scanStatus, setScanStatus] = useState('idle');
   const [result, setResult] = useState(null);
@@ -67,8 +85,12 @@ export default function Scanner({ embedded = false }) {
     setScannerRunning(false);
   }, []);
 
-  const loadCameras = useCallback(async () => {
+  const loadCameras = useCallback(async ({ requestPermission = false } = {}) => {
     try {
+      if (requestPermission) {
+        await requestCameraPermission();
+      }
+
       const devices = await Html5Qrcode.getCameras();
       setCameras(devices);
       if (devices.length && !selectedCameraRef.current) {
@@ -151,11 +173,29 @@ export default function Scanner({ embedded = false }) {
     handleCheckIn(uuid);
   }, [handleCheckIn, showInvalidFormat]);
 
+  const startScannerWithConfig = useCallback(async (html5QrCode, cameraConfig) => {
+    await html5QrCode.start(
+      cameraConfig,
+      {
+        fps: 15,
+        qrbox: (w, h) => {
+          const size = Math.min(w, h) * 0.72;
+          return { width: size, height: size };
+        },
+        aspectRatio: 1,
+      },
+      onScanSuccess,
+      () => {},
+    );
+  }, [onScanSuccess]);
+
   const startScanner = useCallback(async (cameraIdOverride) => {
     if (showManualRef.current) return;
 
     if (!isSecureContext) {
-      setCameraError('Camera requires HTTPS in production');
+      setCameraError(
+        `Camera requires a secure connection. Open ${httpsUrl} and accept the certificate warning, or use Manual Entry below.`,
+      );
       setScanStatus('error');
       return;
     }
@@ -166,37 +206,39 @@ export default function Scanner({ embedded = false }) {
     try {
       await stopScanner();
 
-      const devices = cameras.length ? cameras : await loadCameras();
-      if (!devices.length) {
-        throw new Error('No camera found on this device');
+      const permitted = await requestCameraPermission();
+      const devices = await loadCameras({ requestPermission: false });
+      const resolvedDevices = devices.length ? devices : await Html5Qrcode.getCameras();
+
+      if (!resolvedDevices.length && !permitted) {
+        throw new Error('Camera permission denied. Allow camera access in browser settings.');
       }
+
+      setCameras(resolvedDevices);
 
       const cameraId = cameraIdOverride
         || selectedCameraRef.current
-        || pickDefaultCamera(devices);
+        || pickDefaultCamera(resolvedDevices);
 
-      if (!cameraId) {
-        throw new Error('No camera selected');
+      if (cameraId) {
+        setSelectedCameraId(cameraId);
       }
-
-      setSelectedCameraId(cameraId);
 
       const html5QrCode = new Html5Qrcode(SCANNER_ID);
       scannerRef.current = html5QrCode;
 
-      await html5QrCode.start(
-        cameraId,
-        {
-          fps: 15,
-          qrbox: (w, h) => {
-            const size = Math.min(w, h) * 0.72;
-            return { width: size, height: size };
-          },
-          aspectRatio: 1,
-        },
-        onScanSuccess,
-        () => {},
-      );
+      try {
+        if (cameraId) {
+          await startScannerWithConfig(html5QrCode, cameraId);
+        } else {
+          await startScannerWithConfig(html5QrCode, { facingMode: 'environment' });
+        }
+      } catch (primaryError) {
+        await stopScanner();
+        const retryScanner = new Html5Qrcode(SCANNER_ID);
+        scannerRef.current = retryScanner;
+        await startScannerWithConfig(retryScanner, { facingMode: 'environment' });
+      }
 
       setScannerRunning(true);
       setScanStatus('scanning');
@@ -205,7 +247,7 @@ export default function Scanner({ embedded = false }) {
       setScanStatus('error');
       setScannerRunning(false);
     }
-  }, [cameras, isSecureContext, loadCameras, onScanSuccess, stopScanner]);
+  }, [httpsUrl, isSecureContext, loadCameras, startScannerWithConfig, stopScanner]);
 
   const handleStopCamera = useCallback(async () => {
     await stopScanner();
@@ -221,9 +263,11 @@ export default function Scanner({ embedded = false }) {
   }, [startScanner]);
 
   useEffect(() => {
-    loadCameras();
+    if (isSecureContext) {
+      loadCameras({ requestPermission: false });
+    }
     return () => { stopScanner(); };
-  }, [loadCameras, stopScanner]);
+  }, [isSecureContext, loadCameras, stopScanner]);
 
   const handleManualSubmit = (e) => {
     e.preventDefault();
@@ -271,7 +315,9 @@ export default function Scanner({ embedded = false }) {
 
       {!isSecureContext && (
         <div className="scanner-secure-warning" role="alert">
-          Camera requires HTTPS in production
+          Camera requires HTTPS on mobile devices.
+          {' '}
+          Use <strong>{httpsUrl}</strong> and accept the security warning, or use Manual Entry.
         </div>
       )}
 
@@ -346,7 +392,6 @@ export default function Scanner({ embedded = false }) {
                 type="button"
                 className="btn btn-primary"
                 onClick={() => startScanner()}
-                disabled={!isSecureContext}
               >
                 Start Camera
               </button>
@@ -412,7 +457,9 @@ export default function Scanner({ embedded = false }) {
 
       {showManual && (
         <form className="manual-form" onSubmit={handleManualSubmit}>
+          <label htmlFor="manual-uuid" className="sr-only">Guest UUID</label>
           <input
+            id="manual-uuid"
             type="text"
             value={manualUuid}
             onChange={(e) => setManualUuid(e.target.value)}

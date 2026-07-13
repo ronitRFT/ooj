@@ -85,3 +85,13 @@
 .login-form .btn {
   width: 100%;
 }
+
+@media (max-width: 480px) {
+  .admin-login {
+    padding: 24px 16px calc(24px + var(--safe-bottom));
+  }
+
+  .login-form {
+    padding: 32px 24px;
+  }
+}

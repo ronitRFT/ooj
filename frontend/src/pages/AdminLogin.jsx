@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { adminAPI, setAdminToken } from '../services/api';
 import { isStoredAdminTokenValid } from '../utils/adminAuth';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,8 @@ export default function AdminLogin() {
     try {
       const { data } = await adminAPI.login(form);
       setAdminToken(data.data.token);
-      navigate('/admin/dashboard', { replace: true });
+      const redirectTo = location.state?.from?.pathname || '/admin/dashboard';
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -37,7 +39,7 @@ export default function AdminLogin() {
         <h2>Admin Login</h2>
         <p className="login-subtitle">OOJ Event Management Dashboard</p>
 
-        {error && <div className="form-error">{error}</div>}
+        {error && <div className="form-error" role="alert">{error}</div>}
 
         <div className="form-group">
           <label htmlFor="username">Username</label>

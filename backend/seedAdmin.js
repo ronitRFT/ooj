@@ -5,6 +5,7 @@ const mysql = require('mysql2/promise');
 const USERNAME = process.env.ADMIN_USERNAME;
 const PASSWORD = process.env.ADMIN_PASSWORD;
 const SALT_ROUNDS = 10;
+const forceReset = process.argv.includes('--force');
 
 async function seedAdmin() {
   if (!USERNAME || !String(USERNAME).trim()) {
@@ -34,7 +35,17 @@ async function seedAdmin() {
     );
 
     if (existing.length > 0) {
-      console.log(`Admin "${USERNAME}" already exists — skipping insert.`);
+      if (!forceReset) {
+        console.log(`Admin "${USERNAME}" already exists — skipping. Use --force to reset password.`);
+        return;
+      }
+
+      const passwordHash = await bcrypt.hash(PASSWORD, SALT_ROUNDS);
+      await connection.execute(
+        'UPDATE admins SET password_hash = ? WHERE username = ?',
+        [passwordHash, USERNAME]
+      );
+      console.log(`Admin "${USERNAME}" password reset from .env (--force).`);
       return;
     }
 

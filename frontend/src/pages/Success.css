@@ -1,6 +1,6 @@
 .success-page {
-  padding: 48px 24px 80px;
-  min-height: calc(100vh - 72px - 80px);
+  padding: 32px 16px calc(60px + var(--safe-bottom));
+  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
   display: flex;
   justify-content: center;
   align-items: flex-start;

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import AdminLayout from './components/AdminLayout';
@@ -8,59 +9,42 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { ActiveEventProvider } from './context/ActiveEventContext';
 import Landing from './pages/Landing';
 import Register from './pages/Register';
-import Success from './pages/Success';
 import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminRegistrationPage from './pages/AdminRegistrationPage';
-import AdminScannerPage from './pages/AdminScannerPage';
-import AdminEvents from './pages/AdminEvents';
+import NotFound from './pages/NotFound';
 import AdminAuthSync from './components/AdminAuthSync';
 import './App.css';
 
-function PublicAppShell() {
+const Success = lazy(() => import('./pages/Success'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminRegistrationPage = lazy(() => import('./pages/AdminRegistrationPage'));
+const AdminScannerPage = lazy(() => import('./pages/AdminScannerPage'));
+const AdminEvents = lazy(() => import('./pages/AdminEvents'));
+
+function PageLoader() {
+  return <div className="page-center"><div className="loader">Loading...</div></div>;
+}
+
+function PublicLayout() {
   return (
-    <>
+    <div className="app">
       <Navbar />
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/success/:uuid" element={<Success />} />
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
 
-function AppContent() {
-  const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
-
-  if (!isAdminRoute) {
-    return (
-      <div className="app">
-        <PublicAppShell />
-      </div>
-    );
-  }
-
+function AdminShell() {
   return (
     <div className="app admin-app">
       <main className="main-content">
-        <Routes>
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminIndexRedirect />} />
-
-          <Route element={<ProtectedAdminRoute />}>
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/events" element={<AdminEvents />} />
-              <Route path="/admin/registration" element={<AdminRegistrationPage />} />
-              <Route path="/admin/scanner" element={<AdminScannerPage />} />
-            </Route>
-          </Route>
-        </Routes>
+        <Suspense fallback={<PageLoader />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );
@@ -69,12 +53,34 @@ function AppContent() {
 function App() {
   return (
     <BrowserRouter>
-      <ErrorBoundary>
-        <ActiveEventProvider>
+      <ActiveEventProvider>
+        <ErrorBoundary>
           <AdminAuthSync />
-          <AppContent />
-        </ActiveEventProvider>
-      </ErrorBoundary>
+          <Routes>
+            <Route element={<PublicLayout />}>
+              <Route index element={<Landing />} />
+              <Route path="register" element={<Register />} />
+              <Route path="success/:uuid" element={<Success />} />
+            </Route>
+
+            <Route path="admin" element={<AdminShell />}>
+              <Route path="login" element={<AdminLogin />} />
+              <Route index element={<AdminIndexRedirect />} />
+              <Route element={<ProtectedAdminRoute />}>
+                <Route element={<AdminLayout />}>
+                  <Route path="dashboard" element={<AdminDashboard />} />
+                  <Route path="events" element={<AdminEvents />} />
+                  <Route path="registration" element={<AdminRegistrationPage />} />
+                  <Route path="scanner" element={<AdminScannerPage />} />
+                </Route>
+              </Route>
+              <Route path="*" element={<NotFound admin />} />
+            </Route>
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
+      </ActiveEventProvider>
     </BrowserRouter>
   );
 }

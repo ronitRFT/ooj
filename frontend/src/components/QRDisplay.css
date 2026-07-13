@@ -199,6 +199,16 @@
   margin: 0 0 12px;
 }
 
+.qr-download-notice {
+  font-size: 0.85rem;
+  color: #047857;
+  text-align: center;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: rgba(5, 150, 105, 0.08);
+  border-radius: var(--radius-sm);
+}
+
 .download-actions {
   display: flex;
   flex-direction: column;
@@ -221,5 +231,16 @@
 
   .preview-iframe {
     height: 260px;
+  }
+
+  .qr-success-badge {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .qr-image {
+    width: min(100%, 220px);
+    height: auto;
+    aspect-ratio: 1;
   }
 }

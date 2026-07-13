@@ -1,0 +1,15 @@
+.not-found {
+  text-align: center;
+  padding: 2rem;
+}
+
+.not-found h1 {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary, #D97706);
+}
+
+.not-found p {
+  margin-bottom: 1.5rem;
+  color: var(--color-text-muted, #666);
+}

@@ -10,8 +10,12 @@ export default class ErrorBoundary extends Component {
     return { error };
   }
 
+  componentDidCatch(error, errorInfo) {
+    console.error('UI error boundary caught:', error, errorInfo);
+  }
+
   handleRetry = () => {
-    this.setState({ error: null });
+    window.location.reload();
   };
 
   render() {

@@ -15,6 +15,8 @@ router.get('/stats', verifyAuth, guestController.getDashboardStats);
 router.get('/guests', verifyAuth, guestController.getAllGuests);
 router.get('/guests/event/:eventId', verifyAuth, guestController.getGuestsByEvent);
 router.get('/guests/:id/assets', verifyAuth, guestController.getGuestAssets);
+router.get('/guests/:id/qr', verifyAuth, guestController.getAdminGuestQrAsset);
+router.get('/guests/:id/invitation', verifyAuth, guestController.getAdminGuestInvitationAsset);
 router.patch('/guests/:id/attendance', verifyAuth, guestController.updateGuestAttendance);
 
 const eventAdminRouter = express.Router();

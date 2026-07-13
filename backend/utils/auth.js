@@ -1,7 +1,11 @@
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
 
 const JWT_EXPIRES_IN = '24h';
+const WEAK_JWT_SECRETS = new Set([
+  'change_this_secret_in_production',
+  'secret',
+  'jwt_secret',
+]);
 
 function getJwtSecret() {
   const secret = process.env.JWT_SECRET;
@@ -12,11 +16,13 @@ function getJwtSecret() {
 }
 
 function assertJwtSecretConfigured() {
-  getJwtSecret();
-}
-
-function hashPassword(password) {
-  return crypto.createHash('sha256').update(password).digest('hex');
+  const secret = getJwtSecret();
+  if (secret.length < 32) {
+    throw new Error('JWT_SECRET must be at least 32 characters');
+  }
+  if (process.env.NODE_ENV === 'production' && WEAK_JWT_SECRETS.has(secret.toLowerCase())) {
+    throw new Error('JWT_SECRET must be changed from the default value in production');
+  }
 }
 
 function generateToken(payload = {}) {
@@ -35,7 +41,6 @@ function parseToken(authHeader) {
 }
 
 module.exports = {
-  hashPassword,
   generateToken,
   verifyToken,
   parseToken,

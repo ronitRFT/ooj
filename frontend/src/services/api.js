@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 const ADMIN_TOKEN_KEY = 'adminToken';
 
 const api = axios.create({
@@ -102,7 +102,6 @@ export const adminAPI = {
   getGuestsByEvent: (eventId) => adminGet(`/admin/guests/event/${eventId}`),
   checkIn: (data) => adminPost('/admin/check-in', data),
   getEvents: () => adminGet('/admin/events'),
-  getEvent: (id) => adminGet(`/admin/events/${id}`),
   getRegistrationQr: () => adminGet('/admin/registration-qr'),
   getGuestAssets: (id) => adminGet(`/admin/guests/${id}/assets`),
   updateGuestAttendance: (id, isAttended) => adminPatch(`/admin/guests/${id}/attendance`, { is_attended: isAttended }),
@@ -116,8 +115,45 @@ export const adminAPI = {
 
 export const getUploadUrl = (path) => {
   if (!path) return null;
-  const base = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000';
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
+  const base = apiUrl.startsWith('http') ? apiUrl.replace('/api', '') : '';
   return `${base}${path}`;
 };
+
+function normalizeApiPath(assetPath) {
+  if (!assetPath) return null;
+  if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
+    try {
+      const url = new URL(assetPath);
+      const pathname = url.pathname;
+      return pathname.startsWith('/api/') ? pathname.slice(4) : pathname;
+    } catch {
+      return assetPath;
+    }
+  }
+  return assetPath.startsWith('/api/') ? assetPath.slice(4) : assetPath;
+}
+
+export const getApiAssetUrl = (assetPath) => {
+  if (!assetPath) return null;
+  if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
+    return assetPath;
+  }
+  const base = import.meta.env.VITE_API_URL || '/api';
+  if (base.startsWith('http')) {
+    const normalized = normalizeApiPath(assetPath);
+    const path = normalized.startsWith('/') ? normalized : `/${normalized}`;
+    return `${base}${path}`;
+  }
+  const normalized = normalizeApiPath(assetPath);
+  const path = normalized.startsWith('/') ? normalized : `/${normalized}`;
+  return `${base}${path}`;
+};
+
+export async function fetchAuthenticatedAsset(assetPath) {
+  const path = normalizeApiPath(assetPath);
+  const response = await api.get(path, { responseType: 'blob' });
+  return URL.createObjectURL(response.data);
+}
 
 export default api;

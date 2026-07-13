@@ -134,8 +134,9 @@
 }
 
 .gm-page-btn {
-  padding: 8px 16px;
+  padding: 10px 16px;
   font-size: 0.85rem;
+  min-height: var(--touch-min);
 }
 
 .gm-page-info {
@@ -264,5 +265,36 @@
   .gm-refresh-info {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .gm-filters {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .gm-filter-group input,
+  .gm-filter-group select {
+    min-height: var(--touch-min);
+    font-size: 16px;
+  }
+
+  .gm-refresh-btn {
+    min-height: var(--touch-min);
+    padding: 10px 16px;
+  }
+
+  .gm-modal {
+    margin: 12px;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+  }
+
+  .gm-modal-actions {
+    flex-direction: column;
+  }
+
+  .gm-modal-actions .btn {
+    width: 100%;
   }
 }
