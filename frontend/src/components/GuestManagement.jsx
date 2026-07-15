@@ -1,8 +1,45 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { adminAPI, fetchAuthenticatedAsset } from '../services/api';
-import { downloadFileAsBlob } from '../utils/download';
+import { downloadFileAsBlob, saveBlobAsDownload } from '../utils/download';
 import GuestTable, { useFilteredGuests } from './GuestTable';
+import GuestEditModal from './GuestEditModal';
+import GuestImportModal from './GuestImportModal';
 import './GuestManagement.css';
+
+const STATUS_EXPORT_MAP = {
+  registered: 'pending',
+  checked_in: 'attended',
+};
+
+function DeleteConfirmModal({ pending, onConfirm, onCancel, deleting }) {
+  if (!pending) return null;
+
+  return (
+    <div className="gm-modal-overlay" role="presentation" onClick={onCancel}>
+      <div
+        className="gm-modal gm-modal--confirm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="gm-delete-modal-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 id="gm-delete-modal-title">Delete guest?</h3>
+        <p>
+          This permanently removes <strong>{pending.full_name}</strong> and their QR / invitation
+          files. This action cannot be undone.
+        </p>
+        <div className="gm-modal-actions">
+          <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={deleting}>
+            Cancel
+          </button>
+          <button type="button" className="btn btn-danger" onClick={onConfirm} disabled={deleting}>
+            {deleting ? 'Deleting…' : 'Delete guest'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const REFRESH_INTERVAL_MS = 10000;
 const PAGE_SIZE = 25;
@@ -175,6 +212,11 @@ export default function GuestManagement({
   const [attendancePending, setAttendancePending] = useState(null);
   const [attendanceSaving, setAttendanceSaving] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [editGuest, setEditGuest] = useState(null);
+  const [deletePending, setDeletePending] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [showImport, setShowImport] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const closeAssetModal = useCallback(() => {
     setAssetModal((current) => {
@@ -401,6 +443,58 @@ export default function GuestManagement({
     setAttendancePending({ guest, checked: true });
   };
 
+  const handleEditGuest = (guest) => {
+    setActionError('');
+    setEditGuest(guest);
+  };
+
+  const handleGuestSaved = (updatedGuest) => {
+    updateGuestInList(updatedGuest);
+    fetchGuests(true);
+  };
+
+  const handleDeleteGuest = (guest) => {
+    setActionError('');
+    setDeletePending(guest);
+  };
+
+  const confirmDeleteGuest = async () => {
+    if (!deletePending) return;
+    setDeleting(true);
+    setActionError('');
+    try {
+      await adminAPI.deleteGuest(deletePending.id);
+      setGuests((current) => current.filter((g) => g.id !== deletePending.id));
+      setDeletePending(null);
+      await fetchGuests(true);
+    } catch (err) {
+      setActionError(err.response?.data?.message || 'Failed to delete guest');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleImported = () => {
+    fetchGuests(true);
+  };
+
+  const handleExport = async () => {
+    setActionError('');
+    setExporting(true);
+    try {
+      const status = STATUS_EXPORT_MAP[statusFilter] || null;
+      const { data } = await adminAPI.exportGuests({ eventId: selectedEventId, status });
+      const stamp = new Date().toISOString().slice(0, 10);
+      saveBlobAsDownload(data, `guests-${stamp}.csv`);
+    } catch (err) {
+      setActionError(err.response?.data?.message || 'Failed to export guests');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const activeEventTitle = events.find((e) => e.status === 'active')?.title || '';
+
   const handleEventChange = (e) => {
     const value = e.target.value;
     onEventChange(value === 'all' ? 'all' : Number(value));
@@ -453,6 +547,8 @@ export default function GuestManagement({
           onViewInvitation={handleViewInvitation}
           onQuickAdmit={handleQuickAdmit}
           onAttendanceToggle={handleAttendanceToggle}
+          onEdit={handleEditGuest}
+          onDelete={handleDeleteGuest}
           actionLoading={actionLoading}
         />
 
@@ -500,6 +596,27 @@ export default function GuestManagement({
         saving={attendanceSaving}
       />
 
+      <GuestEditModal
+        guest={editGuest}
+        onClose={() => setEditGuest(null)}
+        onSaved={handleGuestSaved}
+      />
+
+      <DeleteConfirmModal
+        pending={deletePending}
+        onConfirm={confirmDeleteGuest}
+        onCancel={() => setDeletePending(null)}
+        deleting={deleting}
+      />
+
+      {showImport && (
+        <GuestImportModal
+          activeEventTitle={activeEventTitle}
+          onClose={() => setShowImport(false)}
+          onImported={handleImported}
+        />
+      )}
+
       <div className="gm-header">
         <div>
           <h2>Guest Management</h2>
@@ -539,6 +656,24 @@ export default function GuestManagement({
             Refresh
           </button>
         </div>
+      </div>
+
+      <div className="gm-toolbar">
+        <button
+          type="button"
+          className="btn btn-secondary gm-toolbar-btn"
+          onClick={() => setShowImport(true)}
+        >
+          Import CSV
+        </button>
+        <button
+          type="button"
+          className="btn btn-secondary gm-toolbar-btn"
+          onClick={handleExport}
+          disabled={exporting || loading || guests.length === 0}
+        >
+          {exporting ? 'Exporting…' : 'Export CSV'}
+        </button>
       </div>
 
       {actionError && (

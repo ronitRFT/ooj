@@ -12,6 +12,7 @@ import Register from './pages/Register';
 import AdminLogin from './pages/AdminLogin';
 import NotFound from './pages/NotFound';
 import AdminAuthSync from './components/AdminAuthSync';
+import { ROLES } from './utils/adminAuth';
 import './App.css';
 
 const Success = lazy(() => import('./pages/Success'));
@@ -19,6 +20,8 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AdminRegistrationPage = lazy(() => import('./pages/AdminRegistrationPage'));
 const AdminScannerPage = lazy(() => import('./pages/AdminScannerPage'));
 const AdminEvents = lazy(() => import('./pages/AdminEvents'));
+const AdminManagement = lazy(() => import('./pages/AdminManagement'));
+const AdminReports = lazy(() => import('./pages/AdminReports'));
 
 function PageLoader() {
   return <div className="page-center"><div className="loader">Loading...</div></div>;
@@ -68,10 +71,21 @@ function App() {
               <Route index element={<AdminIndexRedirect />} />
               <Route element={<ProtectedAdminRoute />}>
                 <Route element={<AdminLayout />}>
-                  <Route path="dashboard" element={<AdminDashboard />} />
-                  <Route path="events" element={<AdminEvents />} />
-                  <Route path="registration" element={<AdminRegistrationPage />} />
+                  {/* All authenticated roles (incl. volunteer) */}
                   <Route path="scanner" element={<AdminScannerPage />} />
+                  <Route path="registration" element={<AdminRegistrationPage />} />
+
+                  {/* Managers: super_admin + admin */}
+                  <Route element={<ProtectedAdminRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.ADMIN]} />}>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="events" element={<AdminEvents />} />
+                    <Route path="reports" element={<AdminReports />} />
+                  </Route>
+
+                  {/* Super admin only */}
+                  <Route element={<ProtectedAdminRoute allowedRoles={[ROLES.SUPER_ADMIN]} />}>
+                    <Route path="admins" element={<AdminManagement />} />
+                  </Route>
                 </Route>
               </Route>
               <Route path="*" element={<NotFound admin />} />

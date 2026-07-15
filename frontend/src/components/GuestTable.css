@@ -28,6 +28,7 @@
   padding: 14px 16px;
   border-top: 1px solid var(--border-soft);
   color: var(--text-muted);
+  vertical-align: middle;
 }
 
 .guest-table tbody tr:hover {
@@ -59,6 +60,25 @@
   flex-direction: column;
   gap: 8px;
   min-width: 140px;
+}
+
+/* Desktop table: lay actions out horizontally so rows stay compact and aligned */
+.guest-table .guest-actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 260px;
+}
+
+.guest-table .guest-action-btn {
+  padding: 6px 11px;
+  font-size: 0.8rem;
+  min-height: 34px;
+}
+
+.guest-table .guest-attendance-toggle {
+  margin-left: 2px;
 }
 
 .guest-action-btn {

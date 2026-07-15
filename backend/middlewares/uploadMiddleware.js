@@ -49,8 +49,26 @@ const uploadEventImages = multer({
   fileFilter: imageFileFilter,
 });
 
+const MAX_CSV_BYTES = 5 * 1024 * 1024;
+
+function csvFileFilter(req, file, cb) {
+  const isCsv = /\.csv$/i.test(file.originalname)
+    || ['text/csv', 'application/vnd.ms-excel', 'text/plain', 'application/csv'].includes(file.mimetype);
+  if (!isCsv) {
+    return cb(new Error('Only CSV files are allowed'));
+  }
+  cb(null, true);
+}
+
+const uploadCsv = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_CSV_BYTES },
+  fileFilter: csvFileFilter,
+});
+
 module.exports = {
   uploadBanner,
   uploadLogo,
   uploadEventImages,
+  uploadCsv,
 };

@@ -86,6 +86,18 @@ function adminDelete(url) {
   return adminRequest('delete', url);
 }
 
+function adminGetBlob(url) {
+  const headers = buildAuthHeaders();
+  if (!headers) {
+    handleUnauthorized();
+    return Promise.reject({
+      response: { status: 401, data: { message: 'Unauthorized' } },
+      code: 'NO_TOKEN',
+    });
+  }
+  return api({ method: 'get', url, headers, responseType: 'blob' });
+}
+
 export const eventAPI = {
   getActive: () => api.get('/events/active'),
 };
@@ -105,12 +117,32 @@ export const adminAPI = {
   getRegistrationQr: () => adminGet('/admin/registration-qr'),
   getGuestAssets: (id) => adminGet(`/admin/guests/${id}/assets`),
   updateGuestAttendance: (id, isAttended) => adminPatch(`/admin/guests/${id}/attendance`, { is_attended: isAttended }),
+  updateGuest: (id, data) => adminPut(`/admin/guests/${id}`, data),
+  deleteGuest: (id) => adminDelete(`/admin/guests/${id}`),
+  importGuests: (formData) => adminPost('/admin/guests/import', formData),
+  exportGuests: ({ eventId, status } = {}) => {
+    const qs = new URLSearchParams();
+    if (eventId && eventId !== 'all') qs.set('event_id', eventId);
+    if (status) qs.set('status', status);
+    const query = qs.toString();
+    return adminGetBlob(`/admin/guests/export${query ? `?${query}` : ''}`);
+  },
   createEvent: (formData) => adminPost('/admin/events', formData),
   updateEvent: (id, formData) => adminPut(`/admin/events/${id}`, formData),
   setActiveEvent: (id) => adminPost(`/admin/events/${id}/set-active`, {}),
   duplicateEvent: (id) => adminPost(`/admin/events/${id}/duplicate`, {}),
   archiveEvent: (id) => adminPost(`/admin/events/${id}/archive`, {}),
   deleteEvent: (id) => adminDelete(`/admin/events/${id}`),
+  getStats: () => adminGet('/admin/stats'),
+  getRegistrationReport: (eventId) => adminGet(`/admin/reports/registration${eventId && eventId !== 'all' ? `?event_id=${eventId}` : ''}`),
+  getAttendanceReport: (eventId) => adminGet(`/admin/reports/attendance${eventId && eventId !== 'all' ? `?event_id=${eventId}` : ''}`),
+  getInvitationStatusReport: (eventId) => adminGet(`/admin/reports/invitation-status${eventId && eventId !== 'all' ? `?event_id=${eventId}` : ''}`),
+  exportReport: (type, eventId) => adminGetBlob(`/admin/reports/${type}/export${eventId && eventId !== 'all' ? `?event_id=${eventId}` : ''}`),
+  listAdmins: () => adminGet('/admin/admins'),
+  createAdmin: (data) => adminPost('/admin/admins', data),
+  updateAdmin: (id, data) => adminPut(`/admin/admins/${id}`, data),
+  resetAdminPassword: (id, password) => adminPost(`/admin/admins/${id}/reset-password`, { password }),
+  deleteAdmin: (id) => adminDelete(`/admin/admins/${id}`),
 };
 
 export const getUploadUrl = (path) => {

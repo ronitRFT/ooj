@@ -1,5 +1,8 @@
 .admin-dashboard {
-  max-width: 100%;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding-left: clamp(16px, 3vw, 48px);
+  padding-right: clamp(16px, 3vw, 48px);
   overflow-x: hidden;
 }
 
@@ -58,4 +61,96 @@
   color: var(--primary-hover);
   font-size: 0.95rem;
   line-height: 1.5;
+}
+
+.live-checkin-card {
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 40px;
+}
+
+.live-checkin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.live-checkin-header h2 {
+  margin: 4px 0 0;
+  font-size: 1.25rem;
+}
+
+.live-checkin-pending-inv {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--bg-warm);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.live-checkin-progress-track {
+  height: 16px;
+  background: var(--bg-warm);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.live-checkin-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary), #059669);
+  border-radius: 999px;
+  transition: width var(--transition);
+}
+
+.live-checkin-progress-label {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.live-checkin-remaining {
+  color: #b45309;
+}
+
+.live-checkin-timeline {
+  margin-top: 24px;
+}
+
+.live-checkin-timeline-title {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.live-checkin-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 72px;
+}
+
+.live-checkin-spark-bar {
+  flex: 1 1 0;
+  min-width: 3px;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  border-radius: 3px 3px 0 0;
+}
+
+@media (max-width: 600px) {
+  .live-checkin-card {
+    padding: 18px 16px;
+  }
 }

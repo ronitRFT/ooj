@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useActiveEvent } from '../context/ActiveEventContext';
 import { isStoredAdminTokenValid } from '../utils/adminAuth';
 import './Navbar.css';
 
 export default function Navbar() {
   const location = useLocation();
-  const { assets, copy, loading } = useActiveEvent();
   const isAdmin = isStoredAdminTokenValid();
   const adminLink = isAdmin ? '/admin/dashboard' : '/admin/login';
   const [menuOpen, setMenuOpen] = useState(false);
@@ -26,14 +24,9 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner">
         <Link to="/" className="navbar-brand" onClick={() => setMenuOpen(false)}>
-          {assets.logoUrl ? (
-            <img src={assets.logoUrl} alt={`${copy.brand_name} logo`} className="navbar-logo" />
-          ) : (
-            <span className="brand-mark">ॐ</span>
-          )}
           <span className="brand-text">
-            <strong>{copy.brand_name}</strong>
-            {copy.brand_tagline && <small>{copy.brand_tagline}</small>}
+            <strong>OOJ Foundation</strong>
+            <small>Life Energy Invigorated</small>
           </span>
         </Link>
 
@@ -62,10 +55,10 @@ export default function Navbar() {
           )}
           <Link
             to={adminLink}
-            className={`nav-admin ${location.pathname.startsWith('/admin') ? 'active' : ''}`}
+            className={`nav-login-btn ${location.pathname.startsWith('/admin') ? 'active' : ''}`}
             onClick={() => setMenuOpen(false)}
           >
-            Admin
+            {isAdmin ? 'Dashboard' : 'Login'}
           </Link>
         </div>
       </div>
@@ -78,8 +71,6 @@ export default function Navbar() {
           onClick={() => setMenuOpen(false)}
         />
       )}
-
-      {!loading && !assets.logoUrl && <span className="sr-only">{copy.brand_name}</span>}
     </nav>
   );
 }

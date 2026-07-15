@@ -52,11 +52,11 @@ async function seedAdmin() {
     const passwordHash = await bcrypt.hash(PASSWORD, SALT_ROUNDS);
 
     await connection.execute(
-      'INSERT INTO admins (username, password_hash) VALUES (?, ?)',
+      "INSERT INTO admins (username, password_hash, role) VALUES (?, ?, 'super_admin')",
       [USERNAME, passwordHash]
     );
 
-    console.log(`Admin "${USERNAME}" created successfully.`);
+    console.log(`Super admin "${USERNAME}" created successfully.`);
   } finally {
     await connection.end();
   }

@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { adminAPI, setAdminToken } from '../services/api';
-import { isStoredAdminTokenValid } from '../utils/adminAuth';
+import {
+  isStoredAdminTokenValid,
+  getStoredAdminRole,
+  defaultRouteForRole,
+} from '../utils/adminAuth';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
@@ -10,9 +14,10 @@ export default function AdminLogin() {
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   if (isStoredAdminTokenValid()) {
-    return <Navigate to="/admin/dashboard" replace />;
+    return <Navigate to={defaultRouteForRole(getStoredAdminRole())} replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -23,7 +28,8 @@ export default function AdminLogin() {
     try {
       const { data } = await adminAPI.login(form);
       setAdminToken(data.data.token);
-      const redirectTo = location.state?.from?.pathname || '/admin/dashboard';
+      const role = data.data.role;
+      const redirectTo = location.state?.from?.pathname || defaultRouteForRole(role);
       navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
@@ -36,8 +42,10 @@ export default function AdminLogin() {
     <div className="admin-login page-center">
       <Link to="/" className="admin-login-back">← Back to Home</Link>
       <form className="login-form" onSubmit={handleSubmit}>
-        <h2>Admin Login</h2>
-        <p className="login-subtitle">OOJ Event Management Dashboard</p>
+        <div className="login-emblem" aria-hidden="true">ॐ</div>
+        <span className="login-brand">OOJ Foundation</span>
+        <h2 className="login-heading">Welcome Back</h2>
+        <p className="login-subtitle">Sign in to your management dashboard</p>
 
         {error && <div className="form-error" role="alert">{error}</div>}
 
@@ -55,14 +63,25 @@ export default function AdminLogin() {
 
         <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required
-            autoComplete="current-password"
-          />
+          <div className="password-field">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              required
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="password-toggle"
+              onClick={() => setShowPassword((show) => !show)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
         </div>
 
         <button type="submit" className="btn btn-primary" disabled={loading}>

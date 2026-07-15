@@ -30,6 +30,8 @@ function GuestActions({
   onViewInvitation,
   onQuickAdmit,
   onAttendanceToggle,
+  onEdit,
+  onDelete,
   actionLoading,
 }) {
   const isLoading = actionLoading === guest.id;
@@ -60,6 +62,26 @@ function GuestActions({
       >
         Quick Admit
       </button>
+      {onEdit && (
+        <button
+          type="button"
+          className="guest-action-btn guest-action-btn--edit"
+          onClick={() => onEdit(guest)}
+          disabled={isLoading}
+        >
+          Edit
+        </button>
+      )}
+      {onDelete && (
+        <button
+          type="button"
+          className="guest-action-btn guest-action-btn--delete"
+          onClick={() => onDelete(guest)}
+          disabled={isLoading}
+        >
+          Delete
+        </button>
+      )}
       <label className="guest-attendance-toggle">
         <input
           type="checkbox"
@@ -80,6 +102,8 @@ function GuestCard({
   onViewInvitation,
   onQuickAdmit,
   onAttendanceToggle,
+  onEdit,
+  onDelete,
   actionLoading,
 }) {
   return (
@@ -102,6 +126,8 @@ function GuestCard({
         onViewInvitation={onViewInvitation}
         onQuickAdmit={onQuickAdmit}
         onAttendanceToggle={onAttendanceToggle}
+        onEdit={onEdit}
+        onDelete={onDelete}
         actionLoading={actionLoading}
       />
     </article>
@@ -115,6 +141,8 @@ export default function GuestTable({
   onViewInvitation,
   onQuickAdmit,
   onAttendanceToggle,
+  onEdit,
+  onDelete,
   actionLoading = null,
 }) {
   return (
@@ -156,6 +184,8 @@ export default function GuestTable({
                     onViewInvitation={onViewInvitation}
                     onQuickAdmit={onQuickAdmit}
                     onAttendanceToggle={onAttendanceToggle}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
                     actionLoading={actionLoading}
                   />
                 </td>
@@ -175,6 +205,8 @@ export default function GuestTable({
             onViewInvitation={onViewInvitation}
             onQuickAdmit={onQuickAdmit}
             onAttendanceToggle={onAttendanceToggle}
+            onEdit={onEdit}
+            onDelete={onDelete}
             actionLoading={actionLoading}
           />
         ))}

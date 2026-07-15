@@ -6,6 +6,7 @@ const { validatePhone, normalizePhoneForStorage } = require('../utils/phoneValid
 const { sendSuccess, sendError } = require('../utils/apiResponse');
 const { sendInternalError } = require('../utils/safeError');
 const { sendUploadFile } = require('../utils/serveAsset');
+const { parseCsvToObjects, toCsv } = require('../utils/csv');
 
 function guestQrUrl(uuid) {
   return `/guests/uuid/${uuid}/qr`;
@@ -341,6 +342,135 @@ async function getDashboardStats(req, res) {
   }
 }
 
+function validateGuestEditInput(body) {
+  const patch = {};
+
+  if (body.full_name !== undefined) {
+    const fullName = String(body.full_name).trim();
+    if (!fullName) return { error: 'Full name cannot be empty' };
+    if (fullName.length > 255) return { error: 'Full name must be 255 characters or less' };
+    patch.full_name = fullName;
+  }
+
+  if (body.email !== undefined) {
+    const emailCheck = validateEmail(body.email);
+    if (!emailCheck.valid) return { error: emailCheck.error };
+    patch.email = emailCheck.email;
+  }
+
+  if (body.phone !== undefined) {
+    const phoneRaw = String(body.phone).trim();
+    if (!phoneRaw) {
+      patch.phone = null;
+    } else {
+      const phoneCheck = validatePhone(phoneRaw);
+      if (!phoneCheck.valid) return { error: phoneCheck.error };
+      patch.phone = normalizePhoneForStorage(phoneCheck.phone);
+    }
+  }
+
+  if (body.organization !== undefined) {
+    const org = String(body.organization).trim();
+    if (org.length > 255) return { error: 'Organization must be 255 characters or less' };
+    patch.organization = org || null;
+  }
+
+  return { patch };
+}
+
+async function updateGuest(req, res) {
+  try {
+    const { patch, error } = validateGuestEditInput(req.body || {});
+    if (error) {
+      return sendError(res, 400, { message: error });
+    }
+    if (Object.keys(patch).length === 0) {
+      return sendError(res, 400, { message: 'No fields to update' });
+    }
+
+    const result = await guestService.updateGuest(req.params.id, patch);
+    if (result.notFound) {
+      return sendError(res, 404, { message: 'Guest not found' });
+    }
+    if (result.conflict) {
+      return sendError(res, 409, { message: result.conflict });
+    }
+
+    return sendSuccess(res, 200, { message: 'Guest updated', data: result.guest });
+  } catch (error) {
+    return sendInternalError(res, 'updateGuest', error);
+  }
+}
+
+async function deleteGuest(req, res) {
+  try {
+    const deleted = await guestService.deleteGuest(req.params.id);
+    if (!deleted) {
+      return sendError(res, 404, { message: 'Guest not found' });
+    }
+    return sendSuccess(res, 200, { message: 'Guest deleted' });
+  } catch (error) {
+    return sendInternalError(res, 'deleteGuest', error);
+  }
+}
+
+async function importGuests(req, res) {
+  try {
+    if (!req.file || !req.file.buffer) {
+      return sendError(res, 400, { message: 'CSV file is required (field name "file")' });
+    }
+
+    const event = await eventService.getActiveEvent();
+    if (!event || event.status !== 'active') {
+      return sendError(res, 404, { message: 'No active event available for import' });
+    }
+
+    const rows = parseCsvToObjects(req.file.buffer.toString('utf8'));
+    if (rows.length === 0) {
+      return sendError(res, 400, {
+        message: 'CSV is empty or missing a header row (expected columns: full_name, email, phone, organization)',
+      });
+    }
+
+    const summary = await guestService.importGuests(rows, event);
+    return sendSuccess(res, 200, {
+      message: `Imported ${summary.imported}, skipped ${summary.skipped}, failed ${summary.failed}`,
+      data: summary,
+    });
+  } catch (error) {
+    return sendInternalError(res, 'importGuests', error);
+  }
+}
+
+async function exportGuests(req, res) {
+  try {
+    const rows = await guestService.exportGuests({
+      eventId: req.query.event_id || null,
+      status: req.query.status || null,
+    });
+
+    const columns = [
+      { key: 'full_name', label: 'Full Name' },
+      { key: 'email', label: 'Email' },
+      { key: 'phone', label: 'Phone' },
+      { key: 'organization', label: 'Organization' },
+      { key: 'event_title', label: 'Event' },
+      { key: 'attendance', label: 'Attendance' },
+      { key: 'attended_at', label: 'Checked In At' },
+      { key: 'registered_at', label: 'Registered At' },
+    ];
+
+    const csv = toCsv(rows, columns);
+    const stamp = new Date().toISOString().slice(0, 10);
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="guests-${stamp}.csv"`);
+    return res.status(200).send(csv);
+  } catch (error) {
+    return sendInternalError(res, 'exportGuests', error);
+  }
+}
+
 module.exports = {
   registerGuest,
   getGuestByUuid,
@@ -353,6 +483,10 @@ module.exports = {
   getGuestsByEvent,
   getGuestAssets,
   updateGuestAttendance,
+  updateGuest,
+  deleteGuest,
+  importGuests,
+  exportGuests,
   checkIn,
   getDashboardStats,
 };

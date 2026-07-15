@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const { pool } = require('../config/db');
 const { generateToken, parseToken, verifyToken } = require('../utils/auth');
 const { sendSuccess, sendError } = require('../utils/apiResponse');
+const { ROLES, isValidRole } = require('../utils/roles');
 
 async function login(req, res) {
   const { username, password } = req.body;
@@ -12,7 +13,7 @@ async function login(req, res) {
 
   try {
     const [rows] = await pool.execute(
-      'SELECT id, username, password_hash FROM admins WHERE username = ?',
+      'SELECT id, username, password_hash, role FROM admins WHERE username = ?',
       [username]
     );
 
@@ -27,14 +28,16 @@ async function login(req, res) {
       return sendError(res, 401, { message: 'Invalid credentials' });
     }
 
+    const role = isValidRole(admin.role) ? admin.role : ROLES.ADMIN;
+
     const token = generateToken({
       id: admin.id,
       username: admin.username,
-      role: 'admin',
+      role,
     });
 
     return sendSuccess(res, 200, {
-      data: { token, username: admin.username },
+      data: { token, username: admin.username, role },
     });
   } catch (error) {
     return sendError(res, 500, { message: 'Login failed' });
@@ -55,7 +58,7 @@ function verifyAuth(req, res, next) {
   try {
     const decoded = verifyToken(token);
 
-    if (decoded.role !== 'admin') {
+    if (!isValidRole(decoded.role)) {
       return sendError(res, 403, { message: 'Forbidden' });
     }
 

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useActiveEvent } from '../context/ActiveEventContext';
 import './Landing.css';
@@ -19,6 +20,26 @@ function QrIllustration() {
 
 export default function Landing() {
   const { event, loading, error, assets, copy } = useActiveEvent();
+  const detailsRef = useRef(null);
+  const rsvpRef = useRef(null);
+
+  useEffect(() => {
+    const els = [detailsRef.current, rsvpRef.current].filter(Boolean);
+    if (!els.length) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.18 }
+    );
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [event]);
 
   if (loading) {
     return <div className="page-center"><div className="loader">Loading event...</div></div>;
@@ -42,57 +63,76 @@ export default function Landing() {
   return (
     <div className="landing">
       <section className="landing-hero">
-        <div className="hero-banner">
-          {assets.bannerUrl ? (
-            <img src={assets.bannerUrl} alt={copy.title} className="hero-banner-img" />
-          ) : (
-            <div className="hero-banner-fallback" />
-          )}
-          <div className="hero-overlay" />
-        </div>
-        <div className="hero-content fade-in-up">
-          {assets.logoUrl && (
-            <img src={assets.logoUrl} alt={copy.brand_name} className="hero-logo" />
-          )}
-          {copy.subtitle && <span className="hero-subtitle">{copy.subtitle}</span>}
-          <h1 className="hero-title">{copy.title}</h1>
-          {copy.description && <p className="hero-tagline">{copy.description}</p>}
-          <div className="hero-actions">
-            <Link to="/register" className="btn btn-primary btn-lg">Register Now</Link>
-            <a href="#rsvp" className="btn btn-secondary btn-lg">Scan QR</a>
+        <div className="hero-split">
+          <div className="hero-content">
+            {assets.logoUrl && (
+              <img src={assets.logoUrl} alt={copy.brand_name} className="hero-logo" />
+            )}
+            {copy.subtitle && <span className="hero-subtitle">{copy.subtitle}</span>}
+            <h1 className="hero-title">{copy.title}</h1>
+            {copy.description && <p className="hero-tagline">{copy.description}</p>}
+            <div className="hero-actions">
+              <Link to="/register" className="btn btn-primary btn-lg">Register Now</Link>
+              <a href="#rsvp" className="btn btn-secondary btn-lg">Scan QR</a>
+            </div>
+          </div>
+          <div className="hero-media">
+            <img
+              src={assets.bannerUrl || '/hero-side.png'}
+              alt={copy.title}
+              className="hero-media-img"
+            />
+            <div className="hero-media-glow" aria-hidden="true" />
+            <div className="hero-media-caption">
+              <span className="hero-media-name">योगी प्रियव्रत अनिमेष</span>
+              <span className="hero-media-sub">नमो नारायण</span>
+            </div>
           </div>
         </div>
       </section>
 
       <div className="landing-sections">
-        <section className="landing-section fade-in-up fade-in-delay-1">
-          <div className="section-inner">
-            <span className="section-label">Our Mission</span>
-            <h2 className="section-title">About {copy.host_name}</h2>
-            <p className="section-desc">{copy.about_foundation}</p>
+        <section className="landing-section section-philosophy fade-in-up fade-in-delay-1">
+          <div className="philosophy-split">
+            <div className="philosophy-media">
+              <img src="/image.png" alt={copy.host_name} className="philosophy-media-img" />
+            </div>
+            <div className="philosophy-content">
+              <h2 className="section-title">
+                The Guiding Philosophy of<br />Yogi Priyavrat Animesh
+              </h2>
+              <p className="philosophy-subtitle">In Light, In Balance, In Being</p>
+              <p className="section-desc">
+                What is the purpose of life? How does the vibrancy of youth define the arc of
+                one’s existence in this vast cosmos? The answers do not reside in the noise of the
+                outer world, but in the silence within. They dwell in the presence of a Guru—one
+                who sees not only the seen, but also the unseen; one who aligns the seeker with
+                their eternal truth.
+              </p>
+              <p className="section-desc">
+                Yogi Priyavrat Animesh’s spiritual path emerged from a profound recognition: that
+                the hearts of the youth often beat under the weight of confusion, insecurity, and
+                silent longing. His journeys across forests, riversides, highlands, and remote
+                hermitages have not only connected him with the elemental truths of nature, but
+                also brought him closer to the questions that trouble the modern mind.
+              </p>
+              <p className="section-desc">
+                With compassion as his compass and clarity as his method, Yogi Animesh offers a
+                path where contrary forces within can be harmonised—through tapasya (discipline),
+                swadhyaya (self-study), and prana niyantran (channelisation of vital energies).
+                While these practices point to transcendental truths, they also ease the modern
+                burdens of anxiety, distraction, and emotional unrest.
+              </p>
+              <p className="section-desc">
+                His philosophy is inclusive—open to all who seek, all who suffer, and all who dare
+                to ask deeper questions. In his presence, even the weary spirit remembers how to
+                breathe in peace once again.
+              </p>
+            </div>
           </div>
         </section>
 
-        <section className="landing-section section-alt fade-in-up fade-in-delay-2">
-          <div className="section-inner section-split">
-            <div className="section-text">
-              <span className="section-label">Guest of Honor</span>
-              <h2 className="section-title">About {copy.yogi_name}</h2>
-              <p className="section-desc">{copy.about_yogi}</p>
-            </div>
-            <div className="yogi-card card">
-              {assets.logoUrl ? (
-                <img src={assets.logoUrl} alt="" className="yogi-card-logo" />
-              ) : (
-                <div className="yogi-card-icon">🙏</div>
-              )}
-              <h3>{copy.yogi_name}</h3>
-              {copy.host_name && <p className="yogi-card-host">Hosted by {copy.host_name}</p>}
-            </div>
-          </div>
-        </section>
-
-        <section className="landing-section fade-in-up fade-in-delay-2">
+        <section ref={detailsRef} className="landing-section section-details">
           <div className="section-inner">
             <span className="section-label">Gathering Details</span>
             <h2 className="section-title">Event Details</h2>
@@ -118,15 +158,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="landing-section section-alt">
-          <div className="section-inner">
-            <span className="section-label">Purpose</span>
-            <h2 className="section-title">Why Attend</h2>
-            <p className="section-desc section-invitation">{copy.invitation_text}</p>
-          </div>
-        </section>
-
-        <section id="rsvp" className="landing-section section-rsvp">
+        <section id="rsvp" ref={rsvpRef} className="landing-section section-rsvp">
           <div className="section-inner">
             <div className="rsvp-card card">
               <div className="rsvp-content">

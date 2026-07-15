@@ -7,6 +7,57 @@ import GuestManagement from '../components/GuestManagement';
 import EventQrCard from '../components/EventQrCard';
 import './AdminDashboard.css';
 
+function LiveCheckInCard({ active }) {
+  const total = active.total_guests || 0;
+  const attended = active.total_attended || 0;
+  const progress = total > 0 ? Math.round((attended / total) * 100) : 0;
+  const timeline = active.check_in_timeline || [];
+  const maxBucket = Math.max(1, ...timeline.map((t) => t.count));
+
+  return (
+    <section className="live-checkin-card">
+      <header className="live-checkin-header">
+        <div>
+          <span className="section-label">Live Check-in</span>
+          <h2>{active.title}</h2>
+        </div>
+        <div className="live-checkin-meta">
+          <span className="live-checkin-pending-inv">
+            {active.invitation_pending} invitation{active.invitation_pending !== 1 ? 's' : ''} pending
+          </span>
+        </div>
+      </header>
+
+      <div className="live-checkin-progress">
+        <div className="live-checkin-progress-track">
+          <div className="live-checkin-progress-fill" style={{ width: `${progress}%` }} />
+        </div>
+        <p className="live-checkin-progress-label">
+          <strong>{attended}</strong> of <strong>{total}</strong> checked in ({progress}%)
+          {' · '}
+          <span className="live-checkin-remaining">{active.total_pending} remaining</span>
+        </p>
+      </div>
+
+      {timeline.length > 0 && (
+        <div className="live-checkin-timeline">
+          <span className="live-checkin-timeline-title">Check-ins over time</span>
+          <div className="live-checkin-spark">
+            {timeline.map((bucket, idx) => (
+              <span
+                key={idx}
+                className="live-checkin-spark-bar"
+                style={{ height: `${Math.max(8, (bucket.count / maxBucket) * 100)}%` }}
+                title={`${bucket.bucket}: ${bucket.count}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,6 +66,7 @@ export default function AdminDashboard() {
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [eventStats, setEventStats] = useState(null);
   const [eventQr, setEventQr] = useState(null);
+  const [liveStats, setLiveStats] = useState(null);
   const [dashboardNotice, setDashboardNotice] = useState('');
   const [loading, setLoading] = useState(true);
   const [fatalError, setFatalError] = useState('');
@@ -33,12 +85,13 @@ export default function AdminDashboard() {
     }
 
     try {
-      const [eventsResult, qrResult] = await Promise.allSettled([
+      const [eventsResult, qrResult, statsResult] = await Promise.allSettled([
         adminAPI.getEvents(),
         adminAPI.getRegistrationQr(),
+        adminAPI.getStats(),
       ]);
 
-      const authFailure = [eventsResult, qrResult].find(
+      const authFailure = [eventsResult, qrResult, statsResult].find(
         (result) => result.status === 'rejected'
           && (result.reason?.response?.status === 401 || result.reason?.code === 'NO_TOKEN'),
       );
@@ -72,6 +125,10 @@ export default function AdminDashboard() {
         }
       } else {
         notices.push('Registration QR is temporarily unavailable.');
+      }
+
+      if (statsResult.status === 'fulfilled') {
+        setLiveStats(statsResult.value.data.data);
       }
     } catch {
       if (!silent) {
@@ -160,6 +217,10 @@ export default function AdminDashboard() {
         <StatsCard label="Pending" value={displayStats.total_pending} variant="muted" />
         <StatsCard label="Attendance Rate" value={`${attendanceRate}%`} variant="gold" />
       </div>
+
+      {liveStats?.active_event && (
+        <LiveCheckInCard active={liveStats.active_event} />
+      )}
 
       {eventQr && <EventQrCard qrData={eventQr} />}
 

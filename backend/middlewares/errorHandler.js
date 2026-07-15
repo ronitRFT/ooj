@@ -10,6 +10,7 @@ function errorHandler(err, req, res, next) {
   if (err.message?.includes('image files')
     || err.message?.includes('images are allowed')
     || err.message?.includes('mime type')
+    || err.message?.includes('CSV files are allowed')
     || err.message?.includes('File too large')) {
     return sendError(res, 400, { message: err.message });
   }

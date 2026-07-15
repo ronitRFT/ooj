@@ -1,6 +1,12 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ADMIN_TOKEN_KEY, isAdminTokenValid, isStoredAdminTokenValid } from '../utils/adminAuth';
+import {
+  ADMIN_TOKEN_KEY,
+  isAdminTokenValid,
+  isStoredAdminTokenValid,
+  getAdminRole,
+  defaultRouteForRole,
+} from '../utils/adminAuth';
 import { clearAdminToken } from '../services/api';
 
 export default function AdminAuthSync() {
@@ -22,7 +28,7 @@ export default function AdminAuthSync() {
       }
 
       if (isLoginRoute) {
-        navigate('/admin/dashboard', { replace: true });
+        navigate(defaultRouteForRole(getAdminRole(token)), { replace: true });
       }
     };
 
