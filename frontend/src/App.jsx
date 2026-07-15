@@ -22,6 +22,7 @@ const AdminScannerPage = lazy(() => import('./pages/AdminScannerPage'));
 const AdminEvents = lazy(() => import('./pages/AdminEvents'));
 const AdminManagement = lazy(() => import('./pages/AdminManagement'));
 const AdminReports = lazy(() => import('./pages/AdminReports'));
+const VolunteerDashboard = lazy(() => import('./pages/VolunteerDashboard'));
 
 function PageLoader() {
   return <div className="page-center"><div className="loader">Loading...</div></div>;
@@ -72,6 +73,7 @@ function App() {
               <Route element={<ProtectedAdminRoute />}>
                 <Route element={<AdminLayout />}>
                   {/* All authenticated roles (incl. volunteer) */}
+                  <Route path="volunteer" element={<VolunteerDashboard />} />
                   <Route path="scanner" element={<AdminScannerPage />} />
                   <Route path="registration" element={<AdminRegistrationPage />} />
 

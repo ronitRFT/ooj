@@ -7,6 +7,7 @@ import './AdminNavbar.css';
 const ALL_ROLES = [ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.VOLUNTEER];
 
 const NAV_LINKS = [
+  { to: '/admin/volunteer', label: 'Dashboard', roles: [ROLES.VOLUNTEER] },
   { to: '/admin/dashboard', label: 'Dashboard', roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
   { to: '/admin/events', label: 'Events', roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },
   { to: '/admin/reports', label: 'Reports', roles: [ROLES.SUPER_ADMIN, ROLES.ADMIN] },

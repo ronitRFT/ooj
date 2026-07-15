@@ -66,6 +66,11 @@ eventAdminRouter.delete('/:id', eventController.deleteEvent);
 
 router.use('/events', eventAdminRouter);
 
+// Volunteer read-only views (check-in roles): list events + guests for the
+// volunteer dashboard. Reuses existing controllers; no mutations exposed.
+router.get('/volunteer/events', verifyAuth, requireCheckInAccess, eventController.getAllEvents);
+router.get('/volunteer/guests', verifyAuth, requireCheckInAccess, guestController.getAllGuests);
+
 router.get('/registration-qr', verifyAuth, requireCheckInAccess, eventController.getRegistrationQr);
 router.post('/check-in', verifyAuth, requireCheckInAccess, checkInLimiter, guestController.checkIn);
 

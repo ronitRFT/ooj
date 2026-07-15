@@ -66,7 +66,7 @@ export function hasRole(allowedRoles, token = getStoredAdminToken()) {
 }
 
 export function defaultRouteForRole(role) {
-  if (role === ROLES.VOLUNTEER) return '/admin/scanner';
+  if (role === ROLES.VOLUNTEER) return '/admin/volunteer';
   return '/admin/dashboard';
 }
 
