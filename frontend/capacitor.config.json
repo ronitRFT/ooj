@@ -1,0 +1,14 @@
+{
+  "appId": "org.oojfoundation.events",
+  "appName": "OOJ Foundation Events",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "backgroundColor": "#FAF7F2"
+    }
+  }
+}

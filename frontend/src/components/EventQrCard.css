@@ -1,0 +1,130 @@
+.event-qr-card {
+  background: var(--white);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-md);
+}
+
+.event-qr-header h2 {
+  font-size: 1.5rem;
+  margin: 0 0 6px;
+}
+
+.event-qr-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.event-qr-body {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 40px;
+  margin-top: 28px;
+  align-items: start;
+}
+
+.event-qr-image-wrap {
+  text-align: center;
+}
+
+.event-qr-image {
+  width: 180px;
+  height: 180px;
+  background: var(--white);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--secondary);
+  box-shadow: var(--shadow-sm);
+}
+
+.event-qr-scan-hint {
+  margin-top: 14px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  max-width: 180px;
+  line-height: 1.5;
+}
+
+.event-qr-details h3 {
+  font-size: 1.35rem;
+  margin: 0 0 10px;
+  color: var(--primary);
+}
+
+.event-qr-meta {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.event-qr-url {
+  margin: 24px 0;
+}
+
+.event-qr-url label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.event-qr-url code {
+  display: block;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.event-qr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.event-qr-actions .btn {
+  flex: 1;
+  min-width: 140px;
+}
+
+.event-qr-empty {
+  margin-bottom: 16px;
+}
+
+.event-qr-empty h3 {
+  margin-bottom: 8px;
+}
+
+.event-qr-empty .btn {
+  margin-top: 12px;
+}
+
+@media (max-width: 700px) {
+  .event-qr-card {
+    padding: 28px 20px;
+  }
+
+  .event-qr-body {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .event-qr-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .event-qr-actions .btn {
+    width: 100%;
+  }
+}

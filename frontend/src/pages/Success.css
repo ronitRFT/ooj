@@ -1,0 +1,27 @@
+.success-page {
+  padding: 32px 16px calc(60px + var(--safe-bottom));
+  min-height: calc(100vh - var(--navbar-height) - var(--footer-height));
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.success-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.back-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color var(--transition);
+}
+
+.back-link:hover {
+  color: var(--primary);
+}

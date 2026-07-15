@@ -1,0 +1,19 @@
+.admin-layout {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse 70% 40% at 50% 0%, rgba(255, 26, 36, 0.05) 0%, transparent 60%),
+    var(--bg-warm);
+}
+
+.admin-layout-content {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 40px 24px calc(64px + var(--safe-bottom));
+}
+
+@media (max-width: 600px) {
+  .admin-layout-content {
+    padding: 20px 12px calc(40px + var(--safe-bottom));
+  }
+}
