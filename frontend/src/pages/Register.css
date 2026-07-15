@@ -7,13 +7,25 @@
 }
 
 .register-card {
+  position: relative;
   width: 100%;
   max-width: 520px;
   background: var(--white);
   border-radius: var(--radius-lg);
-  border: 1px solid var(--secondary);
-  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 24px 60px rgba(31, 41, 55, 0.12), 0 4px 14px rgba(31, 41, 55, 0.06);
   overflow: hidden;
+}
+
+.register-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 1;
+  background: var(--primary);
 }
 
 .register-summary {
@@ -29,7 +41,9 @@
 
 .register-banner-fallback {
   height: 120px;
-  background: linear-gradient(135deg, var(--event-accent, var(--accent)) 0%, var(--secondary-soft) 100%);
+  background:
+    radial-gradient(120% 90% at 50% 10%, rgba(255, 26, 36, 0.18) 0%, transparent 55%),
+    linear-gradient(150deg, #333333 0%, #1f1f1f 100%);
 }
 
 .register-banner {

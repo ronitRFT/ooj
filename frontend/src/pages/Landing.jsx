@@ -3,6 +3,27 @@ import { Link } from 'react-router-dom';
 import { useActiveEvent } from '../context/ActiveEventContext';
 import './Landing.css';
 
+const TESTIMONIALS = [
+  {
+    name: 'Monika Panwar',
+    role: 'Entrepreneur',
+    quote:
+      'I benefited from the Anusthan by Yogi Priyavrat Animesh ji as it allowed me to reduce anxiety during the pandemic and derive energy to support my family. The feeling of warmth from the OOJ Foundation family was immense.',
+  },
+  {
+    name: 'Mrinalini Shrivastava',
+    role: 'Indian Civil Services',
+    quote:
+      'I was benefited by the Anusthan and overall spiritual awareness as it allowed me to focus my energies in the desired direction, keep the key goal in mind, and reduce dependencies on external factors to the minimal.',
+  },
+  {
+    name: 'Suman Manjari',
+    role: 'Haryana Police Service',
+    quote:
+      'I have known Yogi Priyavrat Animesh ji since 2016-17 and am witness to his spiritual transformation. The aim with which the OOJ Foundation is being established has great relevance for the younger generation.',
+  },
+];
+
 function QrIllustration() {
   return (
     <div className="qr-illustration" aria-hidden="true">
@@ -22,9 +43,10 @@ export default function Landing() {
   const { event, loading, error, assets, copy } = useActiveEvent();
   const detailsRef = useRef(null);
   const rsvpRef = useRef(null);
+  const testimonialsRef = useRef(null);
 
   useEffect(() => {
-    const els = [detailsRef.current, rsvpRef.current].filter(Boolean);
+    const els = [detailsRef.current, rsvpRef.current, testimonialsRef.current].filter(Boolean);
     if (!els.length) return undefined;
     const observer = new IntersectionObserver(
       (entries) => {
@@ -63,31 +85,29 @@ export default function Landing() {
   return (
     <div className="landing">
       <section className="landing-hero">
-        <div className="hero-split">
-          <div className="hero-content">
-            {assets.logoUrl && (
-              <img src={assets.logoUrl} alt={copy.brand_name} className="hero-logo" />
-            )}
-            {copy.subtitle && <span className="hero-subtitle">{copy.subtitle}</span>}
-            <h1 className="hero-title">{copy.title}</h1>
-            {copy.description && <p className="hero-tagline">{copy.description}</p>}
-            <div className="hero-actions">
-              <Link to="/register" className="btn btn-primary btn-lg">Register Now</Link>
-              <a href="#rsvp" className="btn btn-secondary btn-lg">Scan QR</a>
-            </div>
+        <div className="hero-bg" aria-hidden="true">
+          <img
+            src={assets.bannerUrl || '/image.png'}
+            alt=""
+            className="hero-bg-img"
+          />
+          <div className="hero-scrim" />
+        </div>
+        <div className="hero-content">
+          {assets.logoUrl && (
+            <img src={assets.logoUrl} alt={copy.brand_name} className="hero-logo" />
+          )}
+          {copy.subtitle && <span className="hero-subtitle">{copy.subtitle}</span>}
+          <h1 className="hero-title">{copy.title}</h1>
+          {copy.description && <p className="hero-tagline">{copy.description}</p>}
+          <div className="hero-actions">
+            <Link to="/register" className="btn btn-primary btn-lg">Register Now</Link>
+            <a href="#rsvp" className="btn btn-secondary btn-lg">Scan QR</a>
           </div>
-          <div className="hero-media">
-            <img
-              src={assets.bannerUrl || '/hero-side.png'}
-              alt={copy.title}
-              className="hero-media-img"
-            />
-            <div className="hero-media-glow" aria-hidden="true" />
-            <div className="hero-media-caption">
-              <span className="hero-media-name">योगी प्रियव्रत अनिमेष</span>
-              <span className="hero-media-sub">नमो नारायण</span>
-            </div>
-          </div>
+        </div>
+        <div className="hero-namestrip">
+          <span className="hero-media-name">योगी प्रियव्रत अनिमेष</span>
+          <span className="hero-media-sub">नमो नारायण</span>
         </div>
       </section>
 
@@ -95,7 +115,7 @@ export default function Landing() {
         <section className="landing-section section-philosophy fade-in-up fade-in-delay-1">
           <div className="philosophy-split">
             <div className="philosophy-media">
-              <img src="/image.png" alt={copy.host_name} className="philosophy-media-img" />
+              <img src="/hero-side.png" alt={copy.host_name} className="philosophy-media-img" />
             </div>
             <div className="philosophy-content">
               <h2 className="section-title">
@@ -132,28 +152,70 @@ export default function Landing() {
           </div>
         </section>
 
-        <section ref={detailsRef} className="landing-section section-details">
+        <div className="quote-divider">
+          <div className="quote-inner">
+            <span className="quote-mark" aria-hidden="true">“</span>
+            <p>Right channelisation of energy is the force of life.</p>
+            <span className="quote-attr">— Yogi Priyavrat Animesh</span>
+          </div>
+        </div>
+
+        <section ref={detailsRef} className="landing-section section-details section-fullbleed">
+          <div className="fullbleed-split">
+            <div className="fullbleed-text">
+              <span className="section-label">Gathering Details</span>
+              <h2 className="section-title">Event Details</h2>
+              <ul className="detail-list">
+                <li className="detail-row">
+                  <span className="detail-row-icon">📅</span>
+                  <div>
+                    <span className="detail-row-label">Date &amp; Time</span>
+                    <span className="detail-row-value">{eventDate}</span>
+                  </div>
+                </li>
+                <li className="detail-row">
+                  <span className="detail-row-icon">📍</span>
+                  <div>
+                    <span className="detail-row-label">Venue</span>
+                    <span className="detail-row-value">{event.venue}</span>
+                  </div>
+                </li>
+                {copy.host_name && (
+                  <li className="detail-row">
+                    <span className="detail-row-icon">🏛️</span>
+                    <div>
+                      <span className="detail-row-label">Host</span>
+                      <span className="detail-row-value">{copy.host_name}</span>
+                    </div>
+                  </li>
+                )}
+              </ul>
+              <div className="detail-cta">
+                <Link to="/register" className="btn btn-primary btn-lg">Register Now</Link>
+              </div>
+            </div>
+            <div className="fullbleed-media">
+              <img src="/image.png" alt="" className="fullbleed-media-img" />
+              <div className="fullbleed-media-scrim" aria-hidden="true" />
+            </div>
+          </div>
+        </section>
+
+        <section ref={testimonialsRef} className="landing-section section-alt section-testimonials">
           <div className="section-inner">
-            <span className="section-label">Gathering Details</span>
-            <h2 className="section-title">Event Details</h2>
-            <div className="details-grid">
-              <div className="detail-card card">
-                <span className="detail-icon">📅</span>
-                <h3>Date & Time</h3>
-                <p>{eventDate}</p>
-              </div>
-              <div className="detail-card card">
-                <span className="detail-icon">📍</span>
-                <h3>Venue</h3>
-                <p>{event.venue}</p>
-              </div>
-              {copy.host_name && (
-                <div className="detail-card card">
-                  <span className="detail-icon">🏛️</span>
-                  <h3>Host</h3>
-                  <p>{copy.host_name}</p>
-                </div>
-              )}
+            <span className="section-label">Testimonials</span>
+            <h2 className="section-title">Voices of the Seekers</h2>
+            <div className="testimonial-grid">
+              {TESTIMONIALS.map((t) => (
+                <figure key={t.name} className="testimonial-card">
+                  <span className="testimonial-quote-mark" aria-hidden="true">“</span>
+                  <blockquote>{t.quote}</blockquote>
+                  <figcaption>
+                    <span className="testimonial-name">{t.name}</span>
+                    <span className="testimonial-role">{t.role}</span>
+                  </figcaption>
+                </figure>
+              ))}
             </div>
           </div>
         </section>

@@ -4,9 +4,9 @@
   z-index: 200;
   padding-top: var(--safe-top);
   background:
-    linear-gradient(180deg, rgba(28, 21, 14, 0.98) 0%, rgba(22, 16, 11, 0.98) 100%);
-  border-bottom: 1px solid rgba(200, 169, 81, 0.28);
-  box-shadow: 0 6px 24px rgba(10, 7, 4, 0.28);
+    linear-gradient(180deg, rgba(43, 43, 43, 0.98) 0%, rgba(31, 31, 31, 0.98) 100%);
+  border-bottom: 1px solid rgba(255, 26, 36, 0.28);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
 }
 
 /* Gold hairline accent along the very top */
@@ -17,7 +17,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #C8A951 20%, #E4C77B 50%, #C8A951 80%, transparent);
+  background: linear-gradient(90deg, transparent, #FF1A24 20%, #FF5A61 50%, #FF1A24 80%, transparent);
   opacity: 0.9;
 }
 
@@ -50,14 +50,14 @@
   height: 44px;
   flex-shrink: 0;
   border-radius: 12px;
-  background: linear-gradient(145deg, #E4C77B 0%, #C8A951 45%, #A9852F 100%);
-  color: #2a1e10;
+  background: linear-gradient(145deg, #FF5A61 0%, #FF1A24 45%, #D70F18 100%);
+  color: #fff;
   font-family: var(--font-serif);
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   box-shadow:
-    0 4px 14px rgba(200, 169, 81, 0.35),
+    0 4px 14px rgba(255, 26, 36, 0.35),
     inset 0 1px 1px rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 245, 218, 0.5);
 }
@@ -73,7 +73,7 @@
   font-family: var(--font-serif);
   font-size: 1.12rem;
   font-weight: 600;
-  color: #F5EFE4;
+  color: #F5F5F5;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -84,7 +84,7 @@
   font-size: 0.66rem;
   text-transform: uppercase;
   letter-spacing: 0.22em;
-  color: #C8A951;
+  color: #FF1A24;
   font-weight: 500;
 }
 
@@ -97,9 +97,9 @@
   width: var(--touch-min);
   height: var(--touch-min);
   padding: 10px;
-  border: 1px solid rgba(200, 169, 81, 0.4);
+  border: 1px solid rgba(255, 26, 36, 0.4);
   border-radius: var(--radius-sm);
-  background: rgba(245, 239, 228, 0.06);
+  background: rgba(255, 255, 255, 0.06);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -108,7 +108,7 @@
   display: block;
   height: 2px;
   width: 100%;
-  background: #E4C77B;
+  background: #FF5A61;
   border-radius: 2px;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
@@ -142,7 +142,7 @@
 
 .admin-navbar-nav a {
   position: relative;
-  color: rgba(245, 239, 228, 0.72);
+  color: rgba(255, 255, 255, 0.72);
   text-decoration: none;
   padding: 9px 15px;
   border-radius: var(--radius-sm);
@@ -157,12 +157,12 @@
 }
 
 .admin-navbar-nav a:hover {
-  color: #F5EFE4;
-  background: rgba(200, 169, 81, 0.1);
+  color: #F5F5F5;
+  background: rgba(255, 26, 36, 0.1);
 }
 
 .admin-navbar-nav a.active {
-  color: #E4C77B;
+  color: #FF5A61;
   font-weight: 600;
 }
 
@@ -174,18 +174,18 @@
   bottom: 0;
   height: 2px;
   border-radius: 2px;
-  background: linear-gradient(90deg, #C8A951, #E4C77B);
-  box-shadow: 0 0 8px rgba(200, 169, 81, 0.5);
+  background: linear-gradient(90deg, #FF1A24, #FF5A61);
+  box-shadow: 0 0 8px rgba(255, 26, 36, 0.5);
 }
 
 .admin-navbar-nav a.nav-highlight {
-  color: #E4C77B;
-  background: rgba(200, 169, 81, 0.1);
-  border: 1px solid rgba(200, 169, 81, 0.35);
+  color: #FF5A61;
+  background: rgba(255, 26, 36, 0.1);
+  border: 1px solid rgba(255, 26, 36, 0.35);
 }
 
 .admin-navbar-nav a.nav-highlight:hover {
-  background: rgba(200, 169, 81, 0.18);
+  background: rgba(255, 26, 36, 0.18);
 }
 
 /* Account cluster */
@@ -194,7 +194,7 @@
   align-items: center;
   gap: 14px;
   padding-left: 22px;
-  border-left: 1px solid rgba(200, 169, 81, 0.22);
+  border-left: 1px solid rgba(255, 26, 36, 0.22);
 }
 
 .admin-role-badge {
@@ -211,15 +211,15 @@
 }
 
 .admin-role-badge.role-super_admin {
-  color: #F2E2B0;
-  background: linear-gradient(135deg, rgba(200, 169, 81, 0.28), rgba(169, 133, 47, 0.22));
-  border-color: rgba(228, 199, 123, 0.55);
+  color: #FFD5D7;
+  background: linear-gradient(135deg, rgba(255, 26, 36, 0.28), rgba(215, 15, 24, 0.22));
+  border-color: rgba(255, 90, 97, 0.55);
 }
 
 .admin-role-badge.role-admin {
-  color: #F5EFE4;
-  background: rgba(245, 239, 228, 0.1);
-  border-color: rgba(245, 239, 228, 0.22);
+  color: #F5F5F5;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 .admin-role-badge.role-volunteer {
@@ -230,8 +230,8 @@
 
 .admin-logout-btn {
   background: transparent;
-  border: 1px solid rgba(200, 169, 81, 0.45);
-  color: #E4C77B;
+  border: 1px solid rgba(255, 26, 36, 0.45);
+  color: #FF5A61;
   padding: 9px 18px;
   border-radius: var(--radius-sm);
   font-size: 0.85rem;
@@ -244,10 +244,10 @@
 }
 
 .admin-logout-btn:hover {
-  background: linear-gradient(145deg, #E4C77B, #C8A951);
-  border-color: #E4C77B;
-  color: #2a1e10;
-  box-shadow: 0 3px 12px rgba(200, 169, 81, 0.3);
+  background: linear-gradient(145deg, #FF5A61, #FF1A24);
+  border-color: #FF5A61;
+  color: #fff;
+  box-shadow: 0 3px 12px rgba(255, 26, 36, 0.3);
 }
 
 .admin-navbar-backdrop {
@@ -268,7 +268,7 @@
     position: fixed;
     inset: 0;
     top: calc(74px + var(--safe-top));
-    background: rgba(10, 7, 4, 0.55);
+    background: rgba(0, 0, 0, 0.55);
     border: none;
     cursor: pointer;
     z-index: 199;
@@ -283,11 +283,11 @@
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
-    background: linear-gradient(180deg, #211812 0%, #1a130d 100%);
-    border: 1px solid rgba(200, 169, 81, 0.28);
+    background: linear-gradient(180deg, #2b2b2b 0%, #1f1f1f 100%);
+    border: 1px solid rgba(255, 26, 36, 0.28);
     border-radius: var(--radius-md);
     padding: 14px;
-    box-shadow: 0 18px 40px rgba(10, 7, 4, 0.45);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
     z-index: 201;
   }
 
@@ -313,7 +313,7 @@
   }
 
   .admin-navbar-nav a.active {
-    background: rgba(200, 169, 81, 0.14);
+    background: rgba(255, 26, 36, 0.14);
   }
 
   .admin-navbar-account {
@@ -323,7 +323,7 @@
     padding-left: 0;
     padding-top: 14px;
     border-left: none;
-    border-top: 1px solid rgba(200, 169, 81, 0.22);
+    border-top: 1px solid rgba(255, 26, 36, 0.22);
   }
 
   .admin-role-badge {

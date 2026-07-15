@@ -125,10 +125,10 @@
 }
 
 .reports-tab.active {
-  color: #2a1e10;
+  color: #fff;
   font-weight: 600;
-  background: linear-gradient(145deg, #E4C77B, #C8A951);
-  box-shadow: 0 2px 8px rgba(200, 169, 81, 0.35);
+  background: var(--primary);
+  box-shadow: 0 2px 8px rgba(255, 26, 36, 0.35);
 }
 
 /* Stats */

@@ -2,9 +2,9 @@ import { getUploadUrl } from '../services/api';
 
 /** Fallbacks when CMS fields are empty */
 export const DEFAULT_THEME = {
-  theme_primary: '#D97706',
-  theme_secondary: '#C8A951',
-  theme_accent: '#EADBC8',
+  theme_primary: '#FF1A24',
+  theme_secondary: '#D70F18',
+  theme_accent: '#F4F4F4',
 };
 
 export const DEFAULT_COPY = {

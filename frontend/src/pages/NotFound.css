@@ -6,7 +6,7 @@
 .not-found h1 {
   font-size: 4rem;
   margin-bottom: 0.5rem;
-  color: var(--color-primary, #D97706);
+  color: var(--primary, #FF1A24);
 }
 
 .not-found p {

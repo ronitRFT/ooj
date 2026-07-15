@@ -26,8 +26,8 @@
 }
 
 .scanner-secure-warning {
-  background: rgba(217, 119, 6, 0.1);
-  border: 1px solid rgba(217, 119, 6, 0.25);
+  background: rgba(255, 26, 36, 0.1);
+  border: 1px solid rgba(255, 26, 36, 0.25);
   color: var(--primary-hover);
   padding: 12px 16px;
   border-radius: var(--radius-sm);
@@ -179,11 +179,11 @@
 }
 
 .scan-result--already_checked_in {
-  border: 2px solid rgba(217, 119, 6, 0.3);
+  border: 2px solid rgba(255, 26, 36, 0.3);
 }
 
 .scan-result--invalid {
-  border: 2px solid rgba(217, 119, 6, 0.2);
+  border: 2px solid rgba(255, 26, 36, 0.2);
 }
 
 .scan-result-icon {
@@ -209,7 +209,7 @@
 }
 
 .scan-result--invalid .scan-result-icon {
-  background: rgba(217, 119, 6, 0.1);
+  background: rgba(255, 26, 36, 0.1);
   color: var(--primary-hover);
 }
 
